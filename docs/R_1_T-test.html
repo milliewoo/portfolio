@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Supermarket Price Wars - applying paired t-test</title>
+
+<script src="site_libs/header-attrs-2.3.2/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fas fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-r-project"></span>
+     
+    R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="R.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Statistic</li>
+    <li>
+      <a href="R_1_Normal.html">Normal Distribution</a>
+    </li>
+    <li>
+      <a href="R_1_T-test.html">Paired T-test</a>
+    </li>
+    <li>
+      <a href="R_1_Regression.html">Regression</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Wrangling</li>
+    <li>
+      <a href="R_2_Weather.html">Exploring Data Structure</a>
+    </li>
+    <li>
+      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+    </li>
+    <li>
+      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-python"></span>
+     
+    Python
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Python.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Analysis &amp; Modelling</li>
+    <li>
+      <a href="Python_1_StarWars.html">Star Wars</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Machine Learning</li>
+    <li>
+      <a href="Python_2_KNN.html">Data Preparation and KNN</a>
+    </li>
+    <li>
+      <a href="Python_2_DT.html">Decision Tree</a>
+    </li>
+    <li>
+      <a href="Python_2_NB.html">Naive Bayes</a>
+    </li>
+    <li>
+      <a href="Python_2_model.html">Model Evaluation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-stripe-s"></span>
+     
+    SAS
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="SAS.html">Overview</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa-chart-bar"></span>
+     
+    Power BI
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="PowerBI.html">Overview</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/milliewoo/portfolio">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Supermarket Price Wars - applying paired t-test</h1>
+
+</div>
+
+
+<div id="executive-statement" class="section level2">
+<h2>Executive Statement</h2>
+<p>The aim of this report was to investigate whether Coles or Woolworths is cheaper. We have used their online website to collect pricing of matched products in a side-by-side manner. We selected 119 sample products randomly across different category [Cluster sampling method], such as beverage, veggies, fruits, dairy and cleaning products.<br />
+We then compared the means of these exactly same sample products from two different supermarkets. We performed a paired sample t-test to determine if there is any statistically significant difference between prices in Coles and Woolworths. Variables of the data we collected were Items (item name),Coles(price at Coles),Woolworths(price at Woolworths). Our findings showed that there is no statistically significant difference between the means of pricing for the same sample products from Coles and Woolworths. Therefore, we can conclude that the products at Coles and Woolworths are comparable and not cheaper to each others.</p>
+</div>
+<div id="summary-statistics" class="section level2">
+<h2>Summary Statistics</h2>
+<p>The chosen products were needed to comply with a set of guidelines where the products were: the same brand, the same quantity (e.g. by weight or volume), at standard price (e.g. not on special).Read in our side by side price list, which we have simply recorded down the product name in first column, Coles pricing of this particular product in the second column, and Woolworth pricing of the exactly same product in the third column. All the pricing were collected between 11th to 16th of September 2019.</p>
+<pre class="r"><code>rm(list=ls())
+price_list &lt;- read_csv(&quot;src/R/stats/price_list.csv&quot;) 
+head(price_list)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   Items                         Coles Woolworths
+##   &lt;chr&gt;                         &lt;dbl&gt;      &lt;dbl&gt;
+## 1 A2 Full Cream Milk 2L           5          5  
+## 2 Apple &amp; Blackcurrant Juice 2L   2          2  
+## 3 Apple &amp; Mango Juice 2L          2          2  
+## 4 Apple Juice 2L                  2          2  
+## 5 Avocados ea                     2.5        2.2
+## 6 Baby Spinach Prepacked 60g      2          2</code></pre>
+<pre class="r"><code>#Summary Statistics of Coles price list
+price_list %&gt;% summarise(Min = min(Coles,na.rm = TRUE), 
+                         Q1 = quantile(Coles, probs = .25,na.rm = TRUE), 
+                         Median = median(Coles, na.rm = TRUE), 
+                         Q3 = quantile(Coles,probs = .75,na.rm = TRUE), 
+                         IQR = IQR(Coles, na.rm=TRUE),
+                         Max = max(Coles,na.rm = TRUE), 
+                         Mean = mean(Coles, na.rm = TRUE), 
+                         SD = sd(Coles, na.rm = TRUE)
+                         )</code></pre>
+<pre><code>## # A tibble: 1 x 8
+##     Min    Q1 Median    Q3   IQR   Max  Mean    SD
+##   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1   0.5   2.5   3.65  6.25  3.75  38.5  5.90  6.48</code></pre>
+<pre class="r"><code>#Summary Statistics of Woolworths price list
+price_list %&gt;% summarise(Min = min(Woolworths,na.rm = TRUE), 
+                         Q1 = quantile(Woolworths, probs = .25,na.rm = TRUE), 
+                         Median = median(Woolworths, na.rm = TRUE), 
+                         Q3 = quantile(Woolworths,probs = .75,na.rm = TRUE), 
+                         IQR = IQR(Woolworths, na.rm=TRUE),
+                         Max = max(Woolworths,na.rm = TRUE), 
+                         Mean = mean(Woolworths, na.rm = TRUE), 
+                         SD = sd(Woolworths, na.rm = TRUE) 
+                         )</code></pre>
+<pre><code>## # A tibble: 1 x 8
+##     Min    Q1 Median    Q3   IQR   Max  Mean    SD
+##   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  0.43  2.15    3.7     7  4.85    22  5.78  5.53</code></pre>
+<pre class="r"><code>#Side by side boxplot to visualise the two distributions
+price &lt;- price_list %&gt;% gather(supermarket, price, 2:3)
+
+price$supermarket &lt;- price$supermarket %&gt;% factor(levels = c(&quot;Coles&quot;,&quot;Woolworths&quot;))
+cwbox &lt;- boxplot(price ~ supermarket, data = price,main=&quot;Box Plot of Coles vs Woolworths Pricing&quot;)</code></pre>
+<p><img src="R_1_T-test_files/figure-html/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cwbox$out</code></pre>
+<pre><code>##  [1] 18.15 38.50 18.15 38.50 15.00 14.00 18.00 18.00 23.90 18.75 17.00 18.75
+## [13] 19.00 13.00 12.35 12.50 19.90 22.00 19.90 22.00 15.00 20.00 18.00 18.00
+## [25] 18.82 17.00 18.50 19.99 19.00 18.20</code></pre>
+<pre class="r"><code>cwbox$group</code></pre>
+<pre><code>##  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2</code></pre>
+<p>Coles prices seem to be more than Woolworths, according to the descriptive statistics. As the collected samples are imperfect representation of the true population, we need to investigate the significant level which represents the minimum probability on Type I or Type II errors when rejecting or failing to reject our hypothesis. Our selected sample from Coles are coupled to the selected sample from Woolworths (or vice versa), thus we are using the paired sample t-test to perform the investigation.</p>
+<pre class="r"><code>#Add a price difference column to the price_list data frame
+price_list &lt;- price_list %&gt;% mutate(d = Coles - Woolworths)
+
+#Descriptive Statistics for the mean price difference
+price_list %&gt;% summarise(Min = min(d,na.rm = TRUE), 
+                         Q1 = quantile(d, probs = .25,na.rm = TRUE), 
+                         Median = median(d, na.rm = TRUE), 
+                         Q3 = quantile(d,probs = .75,na.rm = TRUE), 
+                         IQR = IQR(d, na.rm=TRUE),
+                         Max = max(d,na.rm = TRUE), 
+                         Mean = mean(d, na.rm = TRUE), 
+                         SD = sd(d, na.rm = TRUE) 
+)</code></pre>
+<pre><code>## # A tibble: 1 x 8
+##     Min      Q1 Median    Q3    IQR   Max  Mean    SD
+##   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 -9.99 -0.0850      0     0 0.0850  16.5 0.117  2.82</code></pre>
+<pre class="r"><code># Use QQplot to check for normality of the differences
+qqPlot(price_list$d, dist=&quot;norm&quot;, main=&quot;QQ Plot of the difference between Coles and Woolworths Pricing&quot;)</code></pre>
+<p><img src="R_1_T-test_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] 21 23</code></pre>
+</div>
+<div id="central-limit-theorem" class="section level2">
+<h2>Central Limit Theorem</h2>
+<p>From the above QQPlot, we could notice the price difference of the random sample we drawn from both supermarkets might not fit well to normal distribution. However, based on Central Limit Theorem, distribution of the sample mean of differences will be approximately normally distributed, regardless of the underlying population distribution when the sample size is large (i.e. n&gt;30). Since our sample size is 119, we can effectively ignore the issue with normality for the price difference of the sample data from both supermarkets and proceed with the paired sample t-test.</p>
+</div>
+<div id="hypothesis-test" class="section level2">
+<h2>Hypothesis Test</h2>
+<p>Paired sample t-test was used to determine which supermarket is the cheapest.</p>
+<p><span class="math inline">\(H_0: \mu_\Delta=0\)</span></p>
+<p><span class="math inline">\(H_A: \mu_\Delta\neq0\)</span></p>
+<p>where <span class="math inline">\(\mu_\Delta\)</span> represents population mean price difference of Coles and Woolworths products</p>
+<pre class="r"><code>#Perform paired sample t-test as below:
+t.test(price_list$Coles, price_list$Woolworths, paired = TRUE, alternative = &quot;two.sided&quot; )</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  price_list$Coles and price_list$Woolworths
+## t = 0.45318, df = 118, p-value = 0.6513
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.3953052  0.6299271
+## sample estimates:
+## mean of the differences 
+##               0.1173109</code></pre>
+<pre class="r"><code>#Which is equivalent to a one-sample t-test of the mean difference with mu = 0.
+t.test(price_list$d, mu = 0, alternative = &quot;two.sided&quot;)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  price_list$d
+## t = 0.45318, df = 118, p-value = 0.6513
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  -0.3953052  0.6299271
+## sample estimates:
+## mean of x 
+## 0.1173109</code></pre>
+<p>Degrees of freedom are 118 (i.e 119-1)</p>
+<pre class="r"><code>#The critical value t* for the paired t-test assuming a two tailed test with alpha=0.05
+qt(p = 0.025, df = 119-1)</code></pre>
+<pre><code>## [1] -1.980272</code></pre>
+<pre class="r"><code>#Visualizations
+# matplot - a line plot where each line represents the paired pricing of the same selected product.
+matplot(t(data.frame(price_list$Coles, price_list$Woolworths)),
+        type = &quot;b&quot;,
+        pch = 19,
+        col = 1,
+        lty = 1,
+        xlab = &quot;Supermarket&quot;,
+        ylab = &quot;Price&quot;,
+        xaxt = &quot;n&quot;,
+        main = &quot;Matplot of paired pricing between Coles and Woolworths&quot;
+)
+axis(1, at = 1:2, labels = c(&quot;Coles&quot;, &quot;Woolworths&quot;))</code></pre>
+<p><img src="R_1_T-test_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#granova.ds -  a scatter plot that reports the mean difference and confidence intervals from the paired samples t-test, and also the correlation between pricing from coles and woolworths.
+granova.ds(
+  data.frame(price_list$Coles, price_list$Woolworths),
+  xlab = &quot;Coles Pricing&quot;,
+  ylab = &quot;Woolworths Pricing&quot;
+)</code></pre>
+<p><img src="R_1_T-test_files/figure-html/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>##             Summary Stats
+## n                 119.000
+## mean(x)             5.900
+## mean(y)             5.783
+## mean(D=x-y)         0.117
+## SD(D)               2.824
+## ES(D)               0.042
+## r(x,y)              0.901
+## r(x+y,d)            0.346
+## LL 95%CI           -0.395
+## UL 95%CI            0.630
+## t(D-bar)            0.453
+## df.t              118.000
+## pval.t              0.651</code></pre>
+<p>The t∗ values are ±1.98. Since t=0.45 is not falling on the rejection region, we fail to reject <span class="math inline">\(H_0\)</span>. The results of the paired hypothesis test are not statistically significant.</p>
+<p>The p-value is 0.65.As p &gt;.05, we fail to reject <span class="math inline">\(H_0\)</span>. There was no statistically significant mean difference in the prices between Coles and Woolworths.</p>
+<p>The 95% CI of the mean difference is found to be [-0.3953052,0.6299271]. As the 95% CI does capture <span class="math inline">\(H_0\)</span>, we fail to reject it.</p>
+</div>
+<div id="interpretation" class="section level2">
+<h2>Interpretation</h2>
+<p>A paired sample t-test was used to test for a significant difference between the means of pricing for the same sample products from Coles and Woolworths. The difference in pricing for these randomly selected products exhibited evidence of non-normality upon inspection of the normal Q-Q plot for both supermarkets, the central limit theorem ensured that the t-test could be applied due to the large sample size, n = 119, in each group. The results of the paired t-test failed to find statistically significant evidence that there would be difference in the means of the population pricing between Coles and Woolworths despite discovering a difference in the means of the sample dataset. The paired t-test found, t(df=118)=0.45, p=0.65, 95% CI [-0.3953052,0.6299271]. The results of the investigation suggest that both supermarkets are not cheaper to each other.</p>
+</div>
+<div id="discussion" class="section level2">
+<h2>Discussion</h2>
+<p>From the findings of our investigation we can conclude that there is no statistically significant mean difference between the prices of Coles and Woolworths. The strengths of our investigation would be having a good sample size (n&gt;30) and having a set of guidelines (same brand, same weight etc.) while collecting data. However, there might have been certain limitations like human error during data collection and data entry.</p>
+<p>To overcome the limitations, we could possibly increase the sample size in our research.</p>
+<p>We also noticed there are numbers of outliers when we compared the pricing from both supermarkets using the box plot, when we examined closer to the data, the outliers belong to products at higher price range. This reflects sensibly to the pricing distribution in supermarket, as most of the consumable items are less than 10 dollars, with a small number of high-end products, such as meat, seafood or even bulk-buy valued pack. In our research, we didn’t remove the outliers, as these data resemble the true population, and the proportion would not affect our results. However the research would be more comprehensive, if we can broaden our collections and compare various sample sets to see if there would be any difference in sampling high price range products and draw different conclusions.</p>
+<p>It would be very interesting, if we could extend our research to different product category, comparing the same set of products across certain time period, or even examine the price difference targeting various types of consumers (e.g. gluten-free vs common dietary, house-brand vs non-house-brand lovers). The research question can roll on extensively base on the above preliminary findings.</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

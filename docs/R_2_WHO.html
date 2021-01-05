@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Exploring Dplyr and Tidyr packages; Handling missing values and outliers</title>
+
+<script src="site_libs/header-attrs-2.3.2/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fas fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-r-project"></span>
+     
+    R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="R.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Statistic</li>
+    <li>
+      <a href="R_1_Normal.html">Normal Distribution</a>
+    </li>
+    <li>
+      <a href="R_1_T-test.html">Paired T-test</a>
+    </li>
+    <li>
+      <a href="R_1_Regression.html">Regression</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Wrangling</li>
+    <li>
+      <a href="R_2_Weather.html">Exploring Data Structure</a>
+    </li>
+    <li>
+      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+    </li>
+    <li>
+      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-python"></span>
+     
+    Python
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Python.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Analysis &amp; Modelling</li>
+    <li>
+      <a href="Python_1_StarWars.html">Star Wars</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Machine Learning</li>
+    <li>
+      <a href="Python_2_KNN.html">Data Preparation and KNN</a>
+    </li>
+    <li>
+      <a href="Python_2_DT.html">Decision Tree</a>
+    </li>
+    <li>
+      <a href="Python_2_NB.html">Naive Bayes</a>
+    </li>
+    <li>
+      <a href="Python_2_model.html">Model Evaluation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-stripe-s"></span>
+     
+    SAS
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="SAS.html">Overview</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa-chart-bar"></span>
+     
+    Power BI
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="PowerBI.html">Overview</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/milliewoo/portfolio">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Exploring Dplyr and Tidyr packages; Handling missing values and outliers</h1>
+
+</div>
+
+
+<div id="task-1-reshpae-and-transform" class="section level2">
+<h2>Task 1: Reshpae and Transform</h2>
+<div id="read-who-dataset" class="section level3">
+<h3>Read WHO dataset</h3>
+<pre class="r"><code># This is an R chunk for reading the WHO data and check the dimension of the original dataset. R codes as below:
+
+WHO &lt;- read.csv(&quot;src/R/data/WHO.csv&quot;, stringsAsFactors = FALSE)
+dim(WHO)</code></pre>
+<pre><code>## [1] 7240   60</code></pre>
+<ul>
+<li>dim() function shows that WHO dataframe is read in with 7240 observations and 60 variables.</li>
+</ul>
+<pre class="r"><code># R chunk for Task 1: 
+#Reshape column 5 - 60 into a long format, as a new single column (a.k.a varibale) &quot;code&quot;, we should have transformed 1 set of 7240 observations to 60-5+1, i.e. 56 set of 7240 observations.  
+WHO &lt;- WHO %&gt;% gather(code, value, 5:60)
+
+#show the first 6 rows of the transformed WHO dataset
+head(WHO)</code></pre>
+<pre><code>##       country iso2 iso3 year        code value
+## 1 Afghanistan   AF  AFG 1980 new_sp_m014    NA
+## 2 Afghanistan   AF  AFG 1981 new_sp_m014    NA
+## 3 Afghanistan   AF  AFG 1982 new_sp_m014    NA
+## 4 Afghanistan   AF  AFG 1983 new_sp_m014    NA
+## 5 Afghanistan   AF  AFG 1984 new_sp_m014    NA
+## 6 Afghanistan   AF  AFG 1985 new_sp_m014    NA</code></pre>
+<pre class="r"><code>#show the dimension of the transformed WHO dataset
+dim(WHO)</code></pre>
+<pre><code>## [1] 405440      6</code></pre>
+<ul>
+<li>dim() function shows that WHO dataframe is transformed to 405440 (i.e.7240*56) observations and 6 variables.</li>
+</ul>
+</div>
+</div>
+<div id="task-2-separate" class="section level2">
+<h2>Task 2: Separate</h2>
+<pre class="r"><code># R chunk for Task 2:
+
+#separate the multi-variable code into &quot;new&quot;, &quot;car&quot;, &quot;sexage&quot; as these can be splitted by the separator character &quot;_&quot; 
+WHO &lt;- WHO %&gt;% separate(code, c(&quot;new&quot;, &quot;var&quot;, &quot;sexage&quot;), sep=&quot;_&quot;)
+
+#separate the &quot;sexage&quot; variable by stripping the first character as &quot;sex&quot;, due to the first character in this column denotes the sex, the rest would denote the age
+
+WHO &lt;- WHO %&gt;% separate(sexage, c(&quot;sex&quot;,&quot;age&quot;), sep = 1)
+
+#show the first 6 rows of the WHO dataset
+head(WHO)</code></pre>
+<pre><code>##       country iso2 iso3 year new var sex age value
+## 1 Afghanistan   AF  AFG 1980 new  sp   m 014    NA
+## 2 Afghanistan   AF  AFG 1981 new  sp   m 014    NA
+## 3 Afghanistan   AF  AFG 1982 new  sp   m 014    NA
+## 4 Afghanistan   AF  AFG 1983 new  sp   m 014    NA
+## 5 Afghanistan   AF  AFG 1984 new  sp   m 014    NA
+## 6 Afghanistan   AF  AFG 1985 new  sp   m 014    NA</code></pre>
+<pre class="r"><code>#show the dimension of the WHO dataset
+dim(WHO)</code></pre>
+<pre><code>## [1] 405440      9</code></pre>
+<ul>
+<li>dim() function shows that WHO dataframe is transformed to 405440 observations [same as task 1] and 9 variables (“code” –&gt; “new”, “var”, “sex” and “age”, i.e. 6+4-1=9)</li>
+</ul>
+</div>
+<div id="task-3-transform" class="section level2">
+<h2>Task 3: Transform</h2>
+<pre class="r"><code># R chunk for Task 3: 
+
+#transform the var column from long format to wide format, there are 4 distinct values (“rel”, “ep”, “sn”, and “sp”) in the var column 
+WHO &lt;- WHO %&gt;% spread(key=var, value = value)
+
+#show the first 6 rows of the WHO dataset
+head(WHO)</code></pre>
+<pre><code>##       country iso2 iso3 year new sex age ep rel sn sp
+## 1 Afghanistan   AF  AFG 1980 new   m 014 NA  NA NA NA
+## 2 Afghanistan   AF  AFG 1981 new   m 014 NA  NA NA NA
+## 3 Afghanistan   AF  AFG 1982 new   m 014 NA  NA NA NA
+## 4 Afghanistan   AF  AFG 1983 new   m 014 NA  NA NA NA
+## 5 Afghanistan   AF  AFG 1984 new   m 014 NA  NA NA NA
+## 6 Afghanistan   AF  AFG 1985 new   m 014 NA  NA NA NA</code></pre>
+<pre class="r"><code>#show the dimension of the WHO dataset
+dim(WHO)</code></pre>
+<pre><code>## [1] 101360     11</code></pre>
+<ul>
+<li>dim() function shows that WHO dataframe is transformed to 101360 observations (there were 405440 rows in task 2, since 4 distinct values in the var column, 405440/4 = 101360, which shows the transformed row count is correct in this step) and 11 variables (9 variables in task 2, since there are 4 distinct values in var column, var –&gt; rel, ep, sn, and sp, should give us 3 more additional columns, but the information in column <strong>value</strong> in task 2 is now disseminated into the cells under rel, ep, sn, and sp, which give us only 2 more additional columns, thus 9 variables from task 2 –&gt; 11 variables in task 3).</li>
+</ul>
+</div>
+<div id="task-4-mutate" class="section level2">
+<h2>Task 4: Mutate</h2>
+<pre class="r"><code># R chunk for Task 4: 
+#Use mutate to factorize age and sex in one statement
+WHO &lt;- WHO %&gt;% mutate(sex=factor(sex, levels=c(&quot;m&quot;,&quot;f&quot;)),age=factor(age, levels=c(&quot;014&quot;,&quot;1524&quot;,&quot;2534&quot;, &quot;3544&quot;, &quot;4554&quot;, &quot;5564&quot;, &quot;65&quot;), labels = c(&quot;&lt;15&quot;, &quot;15-24&quot;, &quot;25-34&quot;, &quot;35-44&quot;, &quot;45-54&quot;, &quot;55-64&quot;,&quot;65&gt;=&quot;), ordered = TRUE))
+
+#show the first 20 rows of the WHO dataset
+head(WHO, 20)</code></pre>
+<pre><code>##        country iso2 iso3 year new sex age ep rel sn sp
+## 1  Afghanistan   AF  AFG 1980 new   m &lt;15 NA  NA NA NA
+## 2  Afghanistan   AF  AFG 1981 new   m &lt;15 NA  NA NA NA
+## 3  Afghanistan   AF  AFG 1982 new   m &lt;15 NA  NA NA NA
+## 4  Afghanistan   AF  AFG 1983 new   m &lt;15 NA  NA NA NA
+## 5  Afghanistan   AF  AFG 1984 new   m &lt;15 NA  NA NA NA
+## 6  Afghanistan   AF  AFG 1985 new   m &lt;15 NA  NA NA NA
+## 7  Afghanistan   AF  AFG 1986 new   m &lt;15 NA  NA NA NA
+## 8  Afghanistan   AF  AFG 1987 new   m &lt;15 NA  NA NA NA
+## 9  Afghanistan   AF  AFG 1988 new   m &lt;15 NA  NA NA NA
+## 10 Afghanistan   AF  AFG 1989 new   m &lt;15 NA  NA NA NA
+## 11 Afghanistan   AF  AFG 1990 new   m &lt;15 NA  NA NA NA
+## 12 Afghanistan   AF  AFG 1991 new   m &lt;15 NA  NA NA NA
+## 13 Afghanistan   AF  AFG 1992 new   m &lt;15 NA  NA NA NA
+## 14 Afghanistan   AF  AFG 1993 new   m &lt;15 NA  NA NA NA
+## 15 Afghanistan   AF  AFG 1994 new   m &lt;15 NA  NA NA NA
+## 16 Afghanistan   AF  AFG 1995 new   m &lt;15 NA  NA NA NA
+## 17 Afghanistan   AF  AFG 1996 new   m &lt;15 NA  NA NA NA
+## 18 Afghanistan   AF  AFG 1997 new   m &lt;15 NA  NA NA  0
+## 19 Afghanistan   AF  AFG 1998 new   m &lt;15 NA  NA NA 30
+## 20 Afghanistan   AF  AFG 1999 new   m &lt;15 NA  NA NA  8</code></pre>
+<pre class="r"><code>#show the dimension of the WHO dataset
+dim(WHO)</code></pre>
+<pre><code>## [1] 101360     11</code></pre>
+<ul>
+<li>dim() function shows that WHO dataframe is transformed to 101360 observations and 11 variables (which is same as task 3, factorize column would not result in any dimensional change)</li>
+</ul>
+</div>
+<div id="task-5-filter-select" class="section level2">
+<h2>Task 5: Filter &amp; Select</h2>
+<pre class="r"><code># R chunk for Task 5: 
+
+WHO_subset &lt;- select(WHO, -c(iso2,new))
+WHO_subset &lt;- WHO_subset %&gt;% filter(country %in% c(&quot;Sri Lanka&quot;, &quot;India&quot;, &quot;Japan&quot;))
+
+#show the first 18 rows of the WHO_subset dataset
+head(WHO_subset, 18)</code></pre>
+<pre><code>##    country iso3 year sex age ep rel sn sp
+## 1    India  IND 1980   m &lt;15 NA  NA NA NA
+## 2    India  IND 1981   m &lt;15 NA  NA NA NA
+## 3    India  IND 1982   m &lt;15 NA  NA NA NA
+## 4    India  IND 1983   m &lt;15 NA  NA NA NA
+## 5    India  IND 1984   m &lt;15 NA  NA NA NA
+## 6    India  IND 1985   m &lt;15 NA  NA NA NA
+## 7    India  IND 1986   m &lt;15 NA  NA NA NA
+## 8    India  IND 1987   m &lt;15 NA  NA NA NA
+## 9    India  IND 1988   m &lt;15 NA  NA NA NA
+## 10   India  IND 1989   m &lt;15 NA  NA NA NA
+## 11   India  IND 1990   m &lt;15 NA  NA NA NA
+## 12   India  IND 1991   m &lt;15 NA  NA NA NA
+## 13   India  IND 1992   m &lt;15 NA  NA NA NA
+## 14   India  IND 1993   m &lt;15 NA  NA NA NA
+## 15   India  IND 1994   m &lt;15 NA  NA NA NA
+## 16   India  IND 1995   m &lt;15 NA  NA NA 16
+## 17   India  IND 1996   m &lt;15 NA  NA NA 47
+## 18   India  IND 1997   m &lt;15 NA  NA NA 50</code></pre>
+<pre class="r"><code>#show the dimension of the dataset
+dim(WHO_subset)</code></pre>
+<pre><code>## [1] 1428    9</code></pre>
+<ul>
+<li>dim() function shows that WHO_subset dataframe has 1428 observations and 9 variables (i.e. there are 1428 rows for country, India, Japan and Sri Lanka, and the subset is 2 variables less compare to WHO dataframe in task 4 after taking away the redundant columns <code>iso2</code> and <code>new</code>)</li>
+</ul>
+</div>
+<div id="task-6-join" class="section level2">
+<h2>Task 6: Join</h2>
+<div id="read-species-and-surveys-data-sets" class="section level3">
+<h3>Read Species and Surveys data sets</h3>
+<pre class="r"><code># R chunk for reading the Species and Surveys data sets. R codes as below:
+
+species &lt;- read.csv(&quot;src/R/data/species.csv&quot;, stringsAsFactors = FALSE)
+surveys &lt;- read.csv(&quot;src/R/data/surveys.csv&quot;, stringsAsFactors = FALSE)</code></pre>
+<pre class="r"><code># R chunk for Task 6: 
+
+surveys_combined &lt;- left_join(surveys, species, key=&quot;species_id&quot;)
+
+#show the first 6 rows of the surveys_combined dataset
+head(surveys_combined)</code></pre>
+<pre><code>##   record_id month day year species_id sex hindfoot_length weight       genus
+## 1         1     7  16 1977         NL   M              32     NA     Neotoma
+## 2         2     7  16 1977         NL   M              33     NA     Neotoma
+## 3         3     7  16 1977         DM   F              37     NA   Dipodomys
+## 4         4     7  16 1977         DM   M              36     NA   Dipodomys
+## 5         5     7  16 1977         DM   M              35     NA   Dipodomys
+## 6         6     7  16 1977         PF   M              14     NA Perognathus
+##    species   taxa
+## 1 albigula Rodent
+## 2 albigula Rodent
+## 3 merriami Rodent
+## 4 merriami Rodent
+## 5 merriami Rodent
+## 6   flavus Rodent</code></pre>
+<pre class="r"><code>#show the dimension of the dataset
+dim(surveys_combined)</code></pre>
+<pre><code>## [1] 35549    11</code></pre>
+<ul>
+<li><p>To add the species information to the surveys data, the left_join function from dplyr package can be used.</p></li>
+<li><p>key=‘species_id’ should be specified to combine the two dataframes by species_id.</p></li>
+<li><p>The output is displayed using the head() function</p></li>
+<li><p>dim() function shows that surveys_combined dataframe contains 35549 observations and 11 variables.</p></li>
+</ul>
+</div>
+</div>
+<div id="task-7-calculate" class="section level2">
+<h2>Task 7: Calculate</h2>
+<div id="step-1" class="section level3">
+<h3>Step 1</h3>
+<p>Use the filter() function to find observations where species_id=“PE”, then use the summarise() function to construct average weight and average hindfoot length statistics grouped by month. na.rm=TRUE is specified in the mean function as the second argument to exclude missing values while calculating average. Save this into <code>PE_avg_by_month</code></p>
+<pre class="r"><code># R chunk for Task 7. R codes as below: 
+
+PE_avg_by_month &lt;- surveys_combined %&gt;% filter(species_id == &quot;PE&quot;) %&gt;% group_by(month) %&gt;%
+  summarise( avg_weight = mean(weight, na.rm = TRUE), avg_hindfoot_legth = mean(hindfoot_length, na.rm= TRUE) )</code></pre>
+</div>
+<div id="step-2" class="section level3">
+<h3>Step 2</h3>
+<p>Print out <code>PE_avg_by_month</code></p>
+<pre class="r"><code>PE_avg_by_month</code></pre>
+<pre><code>## # A tibble: 12 x 3
+##    month avg_weight avg_hindfoot_legth
+##    &lt;int&gt;      &lt;dbl&gt;              &lt;dbl&gt;
+##  1     1       22.1               20.2
+##  2     2       21.9               20.4
+##  3     3       23.5               20.3
+##  4     4       22.5               20.2
+##  5     5       21.0               20.1
+##  6     6       20.3               20.1
+##  7     7       20.9               20.2
+##  8     8       21.5               20.0
+##  9     9       20.9               20.1
+## 10    10       21.3               20.1
+## 11    11       21.2               20.2
+## 12    12       21.3               20.4</code></pre>
+</div>
+</div>
+<div id="task-8-missing-values" class="section level2">
+<h2>Task 8: Missing Values</h2>
+<div id="step-1-1" class="section level3">
+<h3>Step 1</h3>
+<p>Use filter() function to find observations from surveys_combined data frame where year is 1997, rename this data set as “surveys_combined_year”, print the first 6 rows of the filtered dataset.</p>
+<pre class="r"><code># R chunk for Task 8. R codes as below: 
+
+surveys_combined_year &lt;- surveys_combined %&gt;% filter(year == 1997) 
+head(surveys_combined_year)</code></pre>
+<pre><code>##   record_id month day year species_id sex hindfoot_length weight       genus
+## 1     24921     2   8 1997         PB   M              22     32 Chaetodipus
+## 2     24922     2   8 1997         PF   M              16      8 Perognathus
+## 3     24923     2   8 1997         OT   M              19     22   Onychomys
+## 4     24924     2   8 1997         OT   F              20     19   Onychomys
+## 5     24925     2   8 1997         DM   F              37     43   Dipodomys
+## 6     24926     2   8 1997         DM   M              37     51   Dipodomys
+##    species   taxa
+## 1  baileyi Rodent
+## 2   flavus Rodent
+## 3 torridus Rodent
+## 4 torridus Rodent
+## 5 merriami Rodent
+## 6 merriami Rodent</code></pre>
+</div>
+<div id="step-2-1" class="section level3">
+<h3>Step 2</h3>
+<p>Use sum(is.na(weight)) to find the total missing values in the ‘weight’ column and it is grouped by species_id, save this into <code>isNaSO</code>, print the first 6 rows of this variable</p>
+<pre class="r"><code>isNaSO &lt;- surveys_combined_year %&gt;% group_by(species_id) %&gt;%
+  summarise( Missing_weight= sum(is.na(weight)))
+
+head(isNaSO)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   species_id Missing_weight
+##   &lt;chr&gt;               &lt;int&gt;
+## 1 &quot;&quot;                      1
+## 2 &quot;AH&quot;                   37
+## 3 &quot;CB&quot;                    3
+## 4 &quot;DM&quot;                    3
+## 5 &quot;DO&quot;                    0
+## 6 &quot;DS&quot;                    0</code></pre>
+</div>
+<div id="step-3" class="section level3">
+<h3>Step 3</h3>
+<p>simply calculate the average weight of the surveys_combined_year dataset grouped by species_id, save this into the <code>SOmean</code>, print the first 6 rows of this variable</p>
+<pre class="r"><code>SOmean &lt;- surveys_combined_year %&gt;% group_by(species_id) %&gt;%
+  summarise(ave_weight=mean(weight,na.rm=TRUE))
+
+head(SOmean)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   species_id ave_weight
+##   &lt;chr&gt;           &lt;dbl&gt;
+## 1 &quot;&quot;              NaN  
+## 2 &quot;AH&quot;            NaN  
+## 3 &quot;CB&quot;            NaN  
+## 4 &quot;DM&quot;             44.7
+## 5 &quot;DO&quot;             48.2
+## 6 &quot;DS&quot;            111</code></pre>
+</div>
+<div id="step-4" class="section level3">
+<h3>Step 4</h3>
+<p>Use the below R code to replace the missing values in the “weight” column with the mean values of each species, if the value is not missing, just simply retain the original values. Save this imputed data as <code>surveys_weight_imputed</code>.</p>
+<pre class="r"><code>surveys_weight_imputed &lt;- surveys_combined_year %&gt;% group_by(species_id) %&gt;%
+  mutate(weight=ifelse(is.na(weight),mean(weight,na.rm=TRUE),weight))</code></pre>
+</div>
+<div id="checking" class="section level3">
+<h3>Checking</h3>
+<p><strong>To check whether the imputation was successful, we must run the following codes</strong></p>
+<div id="step-c1" class="section level4">
+<h4>Step c1</h4>
+<p>Use sum(is.na(weight)) again to find the total missing values in the ‘weight’ column and grouped by species_id, save this into <code>isNaSI</code>. If the imputation is succesful, all the species_id which avg_weight is not NAN should have a sum(is.na(weight)) = 0 in <code>isNASI</code>. We could compare the first 10 rows of <code>isNaSI</code> with <code>isNaSO</code> (generated in step 2) and <code>SOmean</code> (generated in step3) side by side as below.</p>
+<pre class="r"><code>isNaSI &lt;- surveys_weight_imputed %&gt;% group_by(species_id) %&gt;%
+  summarise( Missing_weight= sum(is.na(weight)))
+
+# Use built-in function kable in knitr package to tidy up `isNASI`, `isNaSO` and `SOmean` into a single table, so we can compare side-by-side.
+
+kable(cbind(head(isNaSO, 10), head(isNaSI, 10), head(SOmean, 10))) %&gt;% add_header_above(c(&quot;isNaSO&quot; = 2, &quot;isNaSI&quot; = 2, &quot;SOmean&quot; = 2)) %&gt;% kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+isNaSO
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+isNaSI
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+SOmean
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+Missing_weight
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+Missing_weight
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+ave_weight
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AH
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:left;">
+AH
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:left;">
+AH
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CB
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+CB
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+CB
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+44.70855
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DO
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+DO
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+DO
+</td>
+<td style="text-align:right;">
+48.17787
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DS
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+DS
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+DS
+</td>
+<td style="text-align:right;">
+111.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NL
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+NL
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+NL
+</td>
+<td style="text-align:right;">
+150.68889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OL
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+OL
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+OL
+</td>
+<td style="text-align:right;">
+33.62500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+24.78516
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PB
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+PB
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+PB
+</td>
+<td style="text-align:right;">
+31.08560
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="step-c2" class="section level4">
+<h4>step c2</h4>
+<p>Pick 2 species_id (e.g. DM and OT) which has missing values but the average weight is not NaN. Check whether we preserve the same value for the non-missing original data. Cross check the first 6 rows of the before and after imputed datasets.</p>
+<pre class="r"><code>#Filter the surveys_combined_year dataset with species_id=&quot;DM&quot; and only select the species_id and weight column, save this into `DM` 
+DM &lt;- surveys_combined_year %&gt;% filter(species_id == &quot;DM&quot;) %&gt;% select(&quot;species_id&quot;, &quot;weight&quot;)
+
+#Filter the surveys_combined_year dataset with species_id=&quot;OT&quot; and only select the species_id and weight column, save this into `OT`
+OT &lt;- surveys_combined_year %&gt;% filter(species_id == &quot;OT&quot;)%&gt;% select(&quot;species_id&quot;, &quot;weight&quot;)
+
+#Filter the surveys_weight_imputed dataset with species_id=&quot;DM&quot; and only select the species_id and weight column, save this into `DM_after` 
+DM_after &lt;- surveys_weight_imputed  %&gt;% filter(species_id == &quot;DM&quot;)%&gt;% select(&quot;species_id&quot;, &quot;weight&quot;)
+
+#Filter the surveys_weight_imputed dataset with species_id=&quot;OT&quot; and only select the species_id and weight column, save this into `OT_after` 
+OT_after &lt;- surveys_weight_imputed  %&gt;% filter(species_id == &quot;OT&quot;)%&gt;% select(&quot;species_id&quot;, &quot;weight&quot;)
+
+#Covert `DM`, `DM_after`, `OT` and `OT_after` into data.table structure
+DM &lt;- as.data.table(DM); DM_after &lt;- as.data.table(DM_after); OT &lt;- as.data.table(OT); OT_after &lt;- as.data.table(OT_after)
+
+# Use built-in function kable in knitr package to tidy up `DM`, `DM_after`, `OT` and `OT_after` into a single table, so we can compare side-by-side.
+kable(cbind(head(DM,6), head(DM_after,6), head(OT,6), head(OT_after,6)))  %&gt;% add_header_above(c(&quot;DM&quot; = 2, &quot;DM_after&quot; = 2, &quot;OT&quot; = 2, &quot;OT_after&quot;=2)) %&gt;% 
+ kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))  </code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+DM
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+DM_after
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+OT
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+OT_after
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+22
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+19
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+22
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="step-c3" class="section level4">
+<h4>step c3</h4>
+<p>Check the imputed weight values are with the correct mean average weight for the species_id “DM” and “OT”</p>
+<pre class="r"><code># Use built-in function kable in knitr package to tidy up `DM` and `DM_after` with all the imputed rows into a single table, so we can compare side-by-side.
+kable(cbind(DM[which(is.na(DM$weight)),],DM_after[which(is.na(DM$weight)),]))%&gt;% add_header_above(c(&quot;DM&quot; = 2, &quot;DM_after&quot; = 2)) %&gt;% kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))  </code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+DM
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+DM_after
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+44.70855
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+44.70855
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+DM
+</td>
+<td style="text-align:right;">
+44.70855
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Use built-in function kable in knitr package to tidy up `OT` and `OT_after` with all the imputed rows into a single table, so we can compare side-by-side.
+      
+kable(cbind(OT[which(is.na(OT$weight)),],OT_after[which(is.na(OT$weight)),]))%&gt;% add_header_above(c(&quot;OT&quot; = 2, &quot;OT_after&quot; = 2)) %&gt;% kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))   </code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+OT
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+OT_after
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+weight
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+24.78516
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+OT
+</td>
+<td style="text-align:right;">
+24.78516
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="task-9-special-values" class="section level2">
+<h2>Task 9: Special Values</h2>
+<div id="step-1-2" class="section level3">
+<h3>Step 1</h3>
+<p>Create a function which would return true if the inspected value is infinite or NaN</p>
+<pre class="r"><code># R chunk for Task 9. R codes as below:
+#
+is.special &lt;- function(x){
+  if (is.numeric(x)) (is.infinite(x) | is.nan(x))
+}</code></pre>
+</div>
+<div id="step-2-2" class="section level3">
+<h3>Step 2</h3>
+<p>Use sum(is.special(weight)) to find the total speical values (i.e. either infinite or NaN ) in the ‘weight’ column grouped by species_id in surveys_weight_imputed dataset, save this into <code>isSpecialSI</code>, print the row count of special value and total row count of the species which has special values in the weight column.</p>
+<pre class="r"><code>isSpecialSI &lt;-surveys_weight_imputed %&gt;% group_by(species_id) %&gt;%
+  summarise( special_cnt= sum(is.special(weight)), total_row_cnt = n())
+
+isSpecialSI[isSpecialSI$special_cnt!=0,]</code></pre>
+<pre><code>## # A tibble: 5 x 3
+##   species_id special_cnt total_row_cnt
+##   &lt;chr&gt;            &lt;int&gt;         &lt;int&gt;
+## 1 &quot;&quot;                   1             1
+## 2 &quot;AH&quot;                37            37
+## 3 &quot;CB&quot;                 3             3
+## 4 &quot;SA&quot;                 1             1
+## 5 &quot;SS&quot;                12            12</code></pre>
+<p><strong>Finding</strong> - 5 species_id (namely: “AH”, “CB”, “SA”, “SS” and missing species_id value, we would call these 5 species_id from now on) have special values in the weight column, and all the rows of these species_id are with special values.</p>
+</div>
+<div id="step-3-1" class="section level3">
+<h3>Step 3</h3>
+<p>Compare the isSpecialSI list with the SOmean list side-by-side (recall, we calculated the average weight of the surveys_combined_year dataset grouped by species_id and saved into <code>SOmean</code>), we found that all the average wieght for these species has been computed as NAN</p>
+<pre class="r"><code>kable(cbind(isSpecialSI[isSpecialSI$special_cnt!=0,], SOmean[is.nan(SOmean$ave_weight),])) %&gt;% add_header_above(c(&quot;isSpecialSI&quot; = 3, &quot;SOmean&quot; = 2)) %&gt;% kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+isSpecialSI
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+SOmean
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+special_cnt
+</th>
+<th style="text-align:right;">
+total_row_cnt
+</th>
+<th style="text-align:left;">
+species_id
+</th>
+<th style="text-align:right;">
+ave_weight
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AH
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:left;">
+AH
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CB
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+CB
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SA
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+SA
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SS
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+SS
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="step-4-1" class="section level3">
+<h3>Step 4</h3>
+<p>Look back into the surveys_combined_year dataset, we found that before imputation, <strong>all</strong> the weight values for these 5 species_id are missing. That’s the reason why we couldn’t compute the average weight for these 5 species_id, and all turned out to be <strong>NaN</strong>. We could validate this by: + Calculate the row counts in the surveys_combined_year of those 5 species_id + Calculate the row counts of special values we found from the weight column of <code>surveys_weight_imputed</code><br />
++ If the above row counts match, then we prove number of rows having special weight values in <code>surveys_weight_imputed</code> would be equal to the number of rows in <code>surveys_combined_year</code> for those 5 species_id.</p>
+<pre class="r"><code>#Calculate the row counts in the surveys_combined_year of those 5 species_id,  &quot;AH&quot;, &quot;CB&quot;, &quot;SA&quot;, &quot;SS&quot; and missing species_id value
+
+count(surveys_combined_year %&gt;% filter(species_id %in% c(&quot;AH&quot;, &quot;CB&quot;, &quot;SA&quot;, &quot;SS&quot;)))+sum(stri_isempty(surveys_combined_year$species_id))</code></pre>
+<pre><code>##    n
+## 1 54</code></pre>
+<pre class="r"><code># Check the row counts of special values from the weight column of `surveys_weight_imputed`
+sum(is.special(surveys_weight_imputed$weight))</code></pre>
+<pre><code>## [1] 54</code></pre>
+</div>
+</div>
+<div id="task-10-outliers" class="section level2">
+<h2>Task 10: Outliers</h2>
+<div id="step-1-3" class="section level3">
+<h3>Step 1</h3>
+<p>Check if there is any missing values in the field hindfoot_length</p>
+<pre class="r"><code># R chunk for Task 10. R codes as below:
+sum(is.na(surveys_combined$hindfoot_length))</code></pre>
+<pre><code>## [1] 4111</code></pre>
+</div>
+<div id="step-2-3" class="section level3">
+<h3>Step 2</h3>
+<p>As the missing value percentage is high (4111 missing out of 35549 records, &gt; 5%), impute the missing hindfoot_length by year. Check whether the average of the first 5 groups have been imputed correctly. Export the original and imputed dataframes to csv files for further checking.</p>
+<pre class="r"><code>isNaSO &lt;- surveys_combined %&gt;% group_by(year) %&gt;%
+  summarise( Missing_length = sum(is.na(hindfoot_length)))
+
+write.csv(isNaSO, &quot;output/R/missing10.csv&quot;)
+
+SOmean &lt;- surveys_combined %&gt;% group_by(year) %&gt;%
+  summarise(ave_length=mean(hindfoot_length,na.rm=TRUE))
+write.csv(SOmean, &quot;output/R/mean10.csv&quot;)
+
+surveys_length_imputed &lt;- surveys_combined %&gt;% group_by(year) %&gt;%
+  mutate(hindfoot_length=ifelse(is.na(hindfoot_length),mean(hindfoot_length,na.rm=TRUE),hindfoot_length))
+
+isNaSI &lt;- surveys_length_imputed %&gt;% group_by(year) %&gt;%
+  summarise( Missing_length = sum(is.na(hindfoot_length)))
+
+write.csv(isNaSI, &quot;output/R/missing10_afterImputed.csv&quot;)
+
+SImean &lt;- surveys_length_imputed %&gt;% group_by(year) %&gt;%
+  summarise(ave_length=mean(hindfoot_length))
+write.csv(SOmean, &quot;output/R/mean10_afterImputed.csv&quot;)
+
+kable(cbind(head(SOmean, 5), head(SImean, 5))) %&gt;% add_header_above(c(&quot;SOmean&quot; = 2, &quot;SImean&quot; = 2)) %&gt;% kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+SOmean
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+SImean
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:right;">
+year
+</th>
+<th style="text-align:right;">
+ave_length
+</th>
+<th style="text-align:right;">
+year
+</th>
+<th style="text-align:right;">
+ave_length
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1977
+</td>
+<td style="text-align:right;">
+36.27696
+</td>
+<td style="text-align:right;">
+1977
+</td>
+<td style="text-align:right;">
+36.27696
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1978
+</td>
+<td style="text-align:right;">
+37.27888
+</td>
+<td style="text-align:right;">
+1978
+</td>
+<td style="text-align:right;">
+37.27888
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1979
+</td>
+<td style="text-align:right;">
+35.16722
+</td>
+<td style="text-align:right;">
+1979
+</td>
+<td style="text-align:right;">
+35.16722
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1980
+</td>
+<td style="text-align:right;">
+35.08204
+</td>
+<td style="text-align:right;">
+1980
+</td>
+<td style="text-align:right;">
+35.08204
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1981
+</td>
+<td style="text-align:right;">
+35.53883
+</td>
+<td style="text-align:right;">
+1981
+</td>
+<td style="text-align:right;">
+35.53883
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="step-3-2" class="section level3">
+<h3>Step 3</h3>
+<p>use boxplot to inspect the outliner of hindfoot_length in the <code>surveys_length_imputed</code> dataset, print the outliers’ values</p>
+<pre class="r"><code>hindfoot_box &lt;- boxplot(surveys_length_imputed$hindfoot_length)</code></pre>
+<p><img src="R_2_WHO_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>hindfoot_box$out</code></pre>
+<pre><code>## [1] 70 64</code></pre>
+<p><strong>Methodology to handle outliers</strong> The outliers values, 64 and 70 do not seem to be data entry or data processing error, as it’s not far off from the upper outlier fences. We shouldn’t delete/exclude these outliers or imputing with the mean values. We should use capping to replace the outliers with the maximum and minimum values within the non-outliers range. Those observations outside the lower outlier fences will be replaced with the value of 5th percentile and those that lie above upper outlier fences will be replaced with the value of 95th percentile according to the notes in module 6.</p>
+</div>
+<div id="step-4-2" class="section level3">
+<h3>step 4</h3>
+<p>create the cap function to return the 5% and 95% quantile of the calling dataset, use it to find the 5% and 95% quantile of the hindfoot_length in the surveys_combined dataset, save this as “lower” and “upper” value in bound variable, print and show these values</p>
+<pre class="r"><code>cap &lt;- function(x){
+  quantiles &lt;- quantile( x, c(.05, 0.25, 0.75, .95 ), na.rm = TRUE)
+  lowercap &lt;- quantiles[1]
+  uppercap &lt;- quantiles[4]
+  return(c(lowercap, uppercap))
+}
+
+
+bound &lt;- cap(surveys_length_imputed$hindfoot_length)
+names(bound) &lt;- c(&quot;Lower&quot;, &quot;Upper&quot;)
+
+bound[&quot;Lower&quot;]</code></pre>
+<pre><code>## Lower 
+##    16</code></pre>
+<pre class="r"><code>bound[&quot;Upper&quot;]</code></pre>
+<pre><code>## Upper 
+##    48</code></pre>
+</div>
+<div id="step-5" class="section level3">
+<h3>Step 5</h3>
+<p>find the outlier row in the surveys_combined data set, print the hindfoot_length value of these rows</p>
+<pre class="r"><code>outlier_row &lt;- which((surveys_length_imputed$hindfoot_length) %in% hindfoot_box$out)
+outlier_row</code></pre>
+<pre><code>## [1] 10574 30425</code></pre>
+<pre class="r"><code>surveys_length_imputed[outlier_row,]$hindfoot_length </code></pre>
+<pre><code>## [1] 70 64</code></pre>
+</div>
+<div id="step-6" class="section level3">
+<h3>Step 6</h3>
+<p>Replace the outliners with the capped values computed in step 2, if the outliner is below the lower bound value, replace it with the lower bound value, otherwise replace with upper bound value</p>
+<pre class="r"><code>surveys_length_imputed[outlier_row,]$hindfoot_length &lt;-
+ifelse(surveys_length_imputed[outlier_row,]$hindfoot_length &lt; bound[&quot;Lower&quot;] ,bound[&quot;Lower&quot;],bound[&quot;Upper&quot;])</code></pre>
+</div>
+<div id="step-7" class="section level3">
+<h3>step 7</h3>
+<p>Draw the boxplot diagram again, there shouldn’t be any outliner</p>
+<pre class="r"><code>boxplot(surveys_length_imputed$hindfoot_length)</code></pre>
+<p><img src="R_2_WHO_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><br> <br></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

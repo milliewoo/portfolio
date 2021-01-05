@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Modelling Body Measurements with normal distribution</title>
+
+<script src="site_libs/header-attrs-2.3.2/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fas fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-r-project"></span>
+     
+    R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="R.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Statistic</li>
+    <li>
+      <a href="R_1_Normal.html">Normal Distribution</a>
+    </li>
+    <li>
+      <a href="R_1_T-test.html">Paired T-test</a>
+    </li>
+    <li>
+      <a href="R_1_Regression.html">Regression</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Wrangling</li>
+    <li>
+      <a href="R_2_Weather.html">Exploring Data Structure</a>
+    </li>
+    <li>
+      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+    </li>
+    <li>
+      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-python"></span>
+     
+    Python
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Python.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Analysis &amp; Modelling</li>
+    <li>
+      <a href="Python_1_StarWars.html">Star Wars</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Machine Learning</li>
+    <li>
+      <a href="Python_2_KNN.html">Data Preparation and KNN</a>
+    </li>
+    <li>
+      <a href="Python_2_DT.html">Decision Tree</a>
+    </li>
+    <li>
+      <a href="Python_2_NB.html">Naive Bayes</a>
+    </li>
+    <li>
+      <a href="Python_2_model.html">Model Evaluation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-stripe-s"></span>
+     
+    SAS
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="SAS.html">Overview</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa-chart-bar"></span>
+     
+    Power BI
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="PowerBI.html">Overview</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/milliewoo/portfolio">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Modelling Body Measurements with normal distribution</h1>
+
+</div>
+
+
+<div id="problem-statement" class="section level2">
+<h2>Problem Statement</h2>
+<p>The body girth and skeletal diameter measurements, together with age, weight, height, and gender for 507 physically active individuals - 247 men and 260 women have been given in the “bdims.csv” file on RMIT canvas website. I have chosen one particular measurement, <strong>the chest girth</strong>, to investigate whether this measurement would fit into the normal distribution model. Following steps are involved:</p>
+<ul>
+<li>Find the descriptive statistics (e.g. mean, median, standard deviation, first and third quartile, interquartile range, minimum and maximum values) of the chest girth by sex</li>
+<li>Remove the outliner values, save this filtered data set</li>
+<li>Find the mean, standard deviation, min and max values again from the filtered data set</li>
+<li>Draw a histogram with the filtered data set, use the new statistics to draw a normal distribution curve over the histogram</li>
+<li>Examine whether the model fits into normal distribution by
+<ul>
+<li>68-95-99.7 Characteristics</li>
+<li>QQ-Plot</li>
+<li>Kolmogorov Smirnov test</li>
+</ul></li>
+</ul>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>Import the body measurements data and prepare it for analysis as below:</p>
+<pre class="r"><code># Only read in the data from che.gi (11th) and sex (25th) column of the bdims.csv file
+bdims &lt;- read_csv(&quot;src/R/stats/bdims.csv&quot;, col_types =&quot;----------d-------------i&quot;)
+
+# Set the sex variable as factor. identify 1 = male, 0 = female
+bdims$sex &lt;- factor(bdims$sex, levels=c(1,0), labels=c(&quot;male&quot;,&quot;female&quot;))</code></pre>
+</div>
+<div id="summary-statistics" class="section level2">
+<h2>Summary Statistics</h2>
+<p>Calculate the statistics and remove the outliners</p>
+<pre class="r"><code>#Filter bdims by sex, save into 2 dataframes and find the descriptive statistics respectively 
+m &lt;- filter(bdims, bdims$sex==&quot;male&quot;)
+f &lt;- filter(bdims, bdims$sex==&quot;female&quot;)
+
+table1 &lt;- descr(m$che.gi, stats = c(&quot;mean&quot;, &quot;med&quot;, &quot;sd&quot;, &quot;Q1&quot;, &quot;Q3&quot;,&quot;IQR&quot;, &quot;min&quot;, &quot;max&quot;), transpose= TRUE)
+
+kable(table1, caption = &quot;Table 1 - statistics of chest girth for male&quot;) %&gt;% kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;, &quot;scale_down&quot;)) </code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 1 - statistics of chest girth for male
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+Median
+</th>
+<th style="text-align:right;">
+Std.Dev
+</th>
+<th style="text-align:right;">
+Q1
+</th>
+<th style="text-align:right;">
+Q3
+</th>
+<th style="text-align:right;">
+IQR
+</th>
+<th style="text-align:right;">
+Min
+</th>
+<th style="text-align:right;">
+Max
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+value
+</td>
+<td style="text-align:right;">
+100.9899
+</td>
+<td style="text-align:right;">
+101
+</td>
+<td style="text-align:right;">
+7.209018
+</td>
+<td style="text-align:right;">
+95.9
+</td>
+<td style="text-align:right;">
+106.1
+</td>
+<td style="text-align:right;">
+10.1
+</td>
+<td style="text-align:right;">
+79.3
+</td>
+<td style="text-align:right;">
+118.7
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>table2 &lt;- descr(f$che.gi, stats = c(&quot;mean&quot;, &quot;med&quot;, &quot;sd&quot;, &quot;Q1&quot;, &quot;Q3&quot;,&quot;IQR&quot;, &quot;min&quot;, &quot;max&quot;), transpose= TRUE)
+
+kable(table2, caption = &quot;Table 2 - statistics of chest girth for female&quot;)%&gt;% kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;, &quot;scale_down&quot;)) </code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 2 - statistics of chest girth for female
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+Median
+</th>
+<th style="text-align:right;">
+Std.Dev
+</th>
+<th style="text-align:right;">
+Q1
+</th>
+<th style="text-align:right;">
+Q3
+</th>
+<th style="text-align:right;">
+IQR
+</th>
+<th style="text-align:right;">
+Min
+</th>
+<th style="text-align:right;">
+Max
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+value
+</td>
+<td style="text-align:right;">
+86.06
+</td>
+<td style="text-align:right;">
+85.5
+</td>
+<td style="text-align:right;">
+6.170406
+</td>
+<td style="text-align:right;">
+81.95
+</td>
+<td style="text-align:right;">
+89.5
+</td>
+<td style="text-align:right;">
+7.525
+</td>
+<td style="text-align:right;">
+72.6
+</td>
+<td style="text-align:right;">
+109
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Find the Upper and Lower Outliner of the chest girth for female and male
+cgFQ &lt;-quantile(f$che.gi, probs = c(0.25,0.75)); cgFIQR &lt;- IQR(f$che.gi,na.rm = TRUE); cgFUpperO &lt;- cgFQ[2] + 1.5* cgFIQR; cgFLowerO &lt;- cgFQ[1] - 1.5* cgFIQR
+
+cgMQ &lt;-quantile(m$che.gi, probs = c(0.25,0.75)); cgMIQR &lt;- IQR(m$che.gi,na.rm = TRUE); cgMUpperO &lt;- cgMQ[2] + 1.5* cgMIQR; cgMLowerO &lt;- cgMQ[1] - 1.5* cgMIQR
+
+#Filter the values of the chest girth for both female and male which fall beyond the upper and lower outliner, save this into a data frame for distribution fitting 
+fNoO &lt;- f %&gt;% filter(che.gi &lt; cgFUpperO &amp; che.gi &gt; cgFLowerO)
+mNoO &lt;- m %&gt;% filter(che.gi &lt; cgMUpperO &amp; che.gi &gt; cgMLowerO)
+
+#Find the min, max, mean and SD of the chest girth for both female and male exclude the Outliner.
+cgFNOMin &lt;- round(min(fNoO$che.gi),3); cgFNOMax &lt;- round(max(fNoO$che.gi),3); cgFNOMean &lt;- round(mean(fNoO$che.gi),3); cgFNOSD &lt;- round(sd(fNoO$che.gi),3)
+
+cgMNOMin &lt;- round(min(mNoO$che.gi),3); cgMNOMax &lt;- round(max(mNoO$che.gi),3); cgMNOMean &lt;- round(mean(mNoO$che.gi),3); cgMNOSD &lt;- round(sd(mNoO$che.gi),3)
+
+df &lt;- data.frame(matrix(ncol = 4, nrow = 2));colnames(df) &lt;- c(&quot;Min&quot;,  &quot;Max&quot;, &quot;Mean&quot;, &quot;SD&quot;); rownames(df) &lt;- c(&quot;Female&quot;, &quot;Male&quot;); df$Min &lt;- c(cgFNOMin,cgMNOMin); df$Max &lt;- c(cgFNOMax, cgMNOMax); df$Mean &lt;- c(cgFNOMean, cgMNOMean); df$SD &lt;- c(cgFNOSD, cgMNOSD)
+
+kable(df, caption = &quot;Table 3 - Min, Max, SD and Mean of Chest girth after removing the outliners&quot;) %&gt;% kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;)) </code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 3 - Min, Max, SD and Mean of Chest girth after removing the outliners
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Min
+</th>
+<th style="text-align:right;">
+Max
+</th>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+SD
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:right;">
+72.6
+</td>
+<td style="text-align:right;">
+99.5
+</td>
+<td style="text-align:right;">
+85.656
+</td>
+<td style="text-align:right;">
+5.500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+84.5
+</td>
+<td style="text-align:right;">
+118.7
+</td>
+<td style="text-align:right;">
+101.078
+</td>
+<td style="text-align:right;">
+7.089
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="distribution-fitting" class="section level2">
+<h2>Distribution Fitting</h2>
+<p>Compare the empirical distribution of chest girth to a normal distribution separately in men and in women.</p>
+<pre class="r"><code># Step 1: Draw the histogram with the filtered chest girth data for female
+hf &lt;- fNoO$che.gi %&gt;% hist(col=&quot;grey&quot;,xlab=&quot;Chest Girth (cm)&quot;, main= &quot;Histogram of Female Chest Girth overlay with\n normal distribution curve&quot;, breaks=25, xlim= c(70, 105), ylim = c(0, 30), cex.main = 0.8)
+
+# Step 2: Use the seq function, generate 40 points on the x-axis between the min and max value of the filtered chest girth data for female, save this into a dataframe as the x-coordinates of our normal distribution curve
+xffit&lt;-seq(cgFNOMin,cgFNOMax,length=40)
+
+# Step 3: Calculate the normal distribution of each x-coordinate, save this as the y-coordinates of our normal distribution curve 
+yffit&lt;-dnorm(xffit,mean=cgFNOMean, sd=cgFNOSD)
+
+# Step 4: Amplify each y-coordinate by multiplying
+# 1) the difference between the first 2 midpoints of the histogram
+# 2) no. of samples in the filtered chest girth data for female 
+yffit &lt;- yffit*diff(hf$mids[1:2])*length(fNoO$che.gi) 
+
+# Step 5: Draw the curve of the normal distribution on top of the histogram of the filtered chest girth data for female 
+lines(xffit, yffit, col=&quot;blue&quot;, lwd=2)
+
+# Step 6: Normal distribution, should be 68% lies between mean ± standard deviation and 95% lies between mean±2 * standard deviation; draw vertical lines (purple - 68%, red - 95%) to indicate that.
+abline(v=(cgFNOMean - (2 *cgFNOSD))  ,col=&quot;red&quot;) ; abline(v=(cgFNOMean + (2 *cgFNOSD)),col=&quot;red&quot;); abline(v=(cgFNOMean - cgFNOSD)  ,col=&quot;purple&quot;) ;abline(v=(cgFNOMean + cgFNOSD),col=&quot;purple&quot;)
+arrows(80.156, 23, 91.156, 23, col = &quot;purple&quot;);arrows(74.656, 27, 96.656, 27, col = &quot;red&quot;);text(85, 25, bquote(~mu %+-% ~sigma), col=&quot;purple&quot;);text(85, 29, bquote(~mu %+-% 2~sigma), col=&quot;red&quot;)</code></pre>
+<p><img src="R_1_Normal_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Repeat Step 1 - 6 for Male filtered data set
+hm &lt;- mNoO$che.gi %&gt;% hist(col=&quot;grey&quot;,xlab=&quot;Chest Girth (cm)&quot;, main= &quot;Histogram of Male Chest Girth overlay with\n normal distribution curve&quot;, breaks=25, xlim= c(80, 125),ylim = c(0, 20), cex.main = 0.8)
+xmfit&lt;-seq(cgMNOMin,cgMNOMax,length=40)
+ymfit&lt;-dnorm(xmfit,mean=cgMNOMean,sd=cgMNOSD)
+ymfit &lt;- ymfit*diff(hm$mids[1:2])*length(mNoO$che.gi)
+lines(xmfit, ymfit, col=&quot;blue&quot;, lwd=2)
+abline(v=(cgMNOMean - (2 *cgMNOSD))  ,col=&quot;red&quot;) ; abline(v=(cgMNOMean + (2 *cgMNOSD)),col=&quot;red&quot;); abline(v=(cgMNOMean - cgMNOSD)  ,col=&quot;purple&quot;) ;abline(v=(cgMNOMean + cgMNOSD),col=&quot;purple&quot;)
+arrows(93.989,13,108.167, 13, col = &quot;purple&quot;);arrows(86.9, 17, 115.256, 17, col = &quot;red&quot;);text(101, 15, bquote(~mu %+-% ~sigma), col=&quot;purple&quot;);text(101, 19, bquote(~mu %+-% 2~sigma), col=&quot;red&quot;)</code></pre>
+<p><img src="R_1_Normal_files/figure-html/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#1.  Compare the count of participants lie between mean ± standard deviation (i.e. Between Purple lines of the graphs shown in the above graph); and for those lies between mean±2 * standard deviation (i.e. Between Red line of the graphs shown in the above graph) with the 68-95-99.7 Characteristics in normal distribution.   Summarise all the count in a table.
+fNOPur &lt;- filter(fNoO, fNoO$che.gi &gt; (cgFNOMean - cgFNOSD) &amp; fNoO$che.gi &lt; (cgFNOMean + cgFNOSD)); fNOPurCount &lt;- length(fNOPur$che.gi)
+fNORed &lt;- filter(fNoO, fNoO$che.gi &gt; (cgFNOMean - 2 * cgFNOSD) &amp; fNoO$che.gi &lt; (cgFNOMean + 2 *cgFNOSD)) ;fNORedCount &lt;- length(fNORed$che.gi)
+mNOPur &lt;- filter(mNoO, mNoO$che.gi &gt; (cgMNOMean - cgMNOSD) &amp; mNoO$che.gi &lt; (cgMNOMean + cgMNOSD));mNOPurCount &lt;- length(mNOPur$che.gi)
+mNORed &lt;- filter(mNoO, mNoO$che.gi &gt; (cgMNOMean - 2 * cgMNOSD) &amp; mNoO$che.gi &lt; (cgMNOMean + 2 *cgMNOSD));mNORedCount &lt;- length(mNORed$che.gi)
+
+newdf &lt;- data.frame(matrix(ncol = 7, nrow = 2))
+colnames(newdf) &lt;- c(&quot;# in original data&quot;,  &quot;# without outliners&quot;, &quot;outliners #&quot;, &quot;# without outliners (68%)&quot;, &quot;# without outliners (95%)&quot;, &quot;# within Purple&quot;, &quot;# within Red&quot;); rownames(newdf) &lt;- c(&quot;Female&quot;, &quot;Male&quot;); newdf$`# in original data` &lt;- c(length(f$che.gi), length(m$che.gi));newdf$`# without outliners` &lt;- c(length(fNoO$che.gi), length(mNoO$che.gi));newdf$`outliners #`&lt;- c(length(f$che.gi)-length(fNoO$che.gi), length(m$che.gi)-length(mNoO$che.gi));newdf$`# without outliners (68%)`&lt;- c(round(0.68*length(fNoO$che.gi),0),round(0.68*length(mNoO$che.gi),0));newdf$`# without outliners (95%)` &lt;- c(round(0.95*length(fNoO$che.gi),0),round(0.95*length(mNoO$che.gi),0));newdf$`# within Purple` &lt;- c(fNOPurCount, mNOPurCount); newdf$`# within Red`&lt;- c(fNORedCount, mNORedCount); 
+
+kable(newdf, caption = &quot;Table 4 - Count (#) of participants of Chest girth&quot;) %&gt;% kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;))</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 4 - Count (#) of participants of Chest girth
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+# in original data
+</th>
+<th style="text-align:right;">
+# without outliners
+</th>
+<th style="text-align:right;">
+outliners #
+</th>
+<th style="text-align:right;">
+# without outliners (68%)
+</th>
+<th style="text-align:right;">
+# without outliners (95%)
+</th>
+<th style="text-align:right;">
+# within Purple
+</th>
+<th style="text-align:right;">
+# within Red
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:right;">
+260
+</td>
+<td style="text-align:right;">
+255
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+173
+</td>
+<td style="text-align:right;">
+242
+</td>
+<td style="text-align:right;">
+180
+</td>
+<td style="text-align:right;">
+239
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+247
+</td>
+<td style="text-align:right;">
+246
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+167
+</td>
+<td style="text-align:right;">
+234
+</td>
+<td style="text-align:right;">
+162
+</td>
+<td style="text-align:right;">
+235
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#2. Compare the data set with normal distribution using QQ Plot
+qqnorm(fNoO$che.gi, main=&quot;Normal QQ plot for female Chest girth&quot;); qqline(fNoO$che.gi, col=&#39;red&#39;)</code></pre>
+<p><img src="R_1_Normal_files/figure-html/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qqnorm(mNoO$che.gi, main=&quot;Normal QQ plot for male Chest girth&quot;); qqline(mNoO$che.gi, col=&#39;red&#39;)</code></pre>
+<p><img src="R_1_Normal_files/figure-html/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#3. Apply Kolmogorov Smirnov test 
+ks.test(fNoO$che.gi, &quot;pnorm&quot;, cgFNOMean, cgFNOSD)</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  fNoO$che.gi
+## D = 0.046863, p-value = 0.63
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>ks.test(mNoO$che.gi, &quot;pnorm&quot;, cgMNOMean, cgMNOSD)</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  mNoO$che.gi
+## D = 0.037948, p-value = 0.8706
+## alternative hypothesis: two-sided</code></pre>
+</div>
+<div id="interpretation" class="section level2">
+<h2>Interpretation</h2>
+<p>From the above graphs, visually, I could see that for both male and female:</p>
+<ul>
+<li>the derived histograms fit resonably well to the normal distribution curves.</li>
+<li>the points in the normal QQ-plot are very close to the QQ-Line, which indicate a good fit with the normal distributions.</li>
+</ul>
+<p>If we look closer to the <strong>filtered</strong> data set.</p>
+<p>For female - outliner:1.923% (5 out of 260); 180 participants fall between <span class="math inline">\(\mu\)</span> <span class="math inline">\(\pm\)</span> <span class="math inline">\(\sigma\)</span>, which <strong>exceeds</strong> the 68% rule (68% of 255 is 173); 239 participants (93.72%) fall between <span class="math inline">\(\mu\)</span> <span class="math inline">\(\pm\)</span> 2<span class="math inline">\(\sigma\)</span>, which <strong>slightly falls behind</strong> the 95% rule (95% of 255 is 242).</p>
+<p>For male - outliner:0.405% (1 out of 247); 162 participants (65.85%) fall between <span class="math inline">\(\mu\)</span> <span class="math inline">\(\pm\)</span> <span class="math inline">\(\sigma\)</span> which <strong>slightly falls behind</strong> the 68% rule (68% of 246 is 167); 235 participants fall between <span class="math inline">\(\mu\)</span> <span class="math inline">\(\pm\)</span> 2<span class="math inline">\(\sigma\)</span> which <strong>exceeds</strong> the 95% rule (95% of 246 is 234).</p>
+<p>With the small percentage on the outliners, we can conclude the filtered data set is quite inclusive in the above investigation. The data fits quite well to the normal distribution except it slightly falls behind on the 68% (for male) and 95% (for female) confidence interval respectively. In the Kolmogorov-Smirnov test, for male: p-value = 0.8706; for female: p-value = 0.63, with these high Pr values, we would not reject <span class="math inline">\(h_{0}\)</span>, which is the hypothesis of no difference between the filtered chest girth data with normal distributions. As Male’s data has a higher p-value in the test, it fits even better to normal distributions.</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Data Preparation and transformation</title>
+
+<script src="site_libs/header-attrs-2.3.2/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fas fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-r-project"></span>
+     
+    R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="R.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Statistic</li>
+    <li>
+      <a href="R_1_Normal.html">Normal Distribution</a>
+    </li>
+    <li>
+      <a href="R_1_T-test.html">Paired T-test</a>
+    </li>
+    <li>
+      <a href="R_1_Regression.html">Regression</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Wrangling</li>
+    <li>
+      <a href="R_2_Weather.html">Exploring Data Structure</a>
+    </li>
+    <li>
+      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+    </li>
+    <li>
+      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-python"></span>
+     
+    Python
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Python.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Analysis &amp; Modelling</li>
+    <li>
+      <a href="Python_1_StarWars.html">Star Wars</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Machine Learning</li>
+    <li>
+      <a href="Python_2_KNN.html">Data Preparation and KNN</a>
+    </li>
+    <li>
+      <a href="Python_2_DT.html">Decision Tree</a>
+    </li>
+    <li>
+      <a href="Python_2_NB.html">Naive Bayes</a>
+    </li>
+    <li>
+      <a href="Python_2_model.html">Model Evaluation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-stripe-s"></span>
+     
+    SAS
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="SAS.html">Overview</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa-chart-bar"></span>
+     
+    Power BI
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="PowerBI.html">Overview</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/milliewoo/portfolio">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Data Preparation and transformation</h1>
+
+</div>
+
+
+<div id="executive-summary" class="section level2">
+<h2>Executive Summary</h2>
+<p>The FIA Formula One World Championship has been one of the premier forms of racing around the world since its inaugural season in 1950. A set of csv files with different relations of F1 information are used to perform all the required data preprocessing tasks. We have come up with 2 different research questions so that we have directions to join the required files to get sufficient information. All the variables of the read-in data has been reviewed and converted into proper data types. We need to filter and select desired observations to find the solutions of our research questions. In addition, we also reshaped our data using spread, and transform the units of measurements of the variables with mutate in order to carry out better presentation of the results. Missing values and outliers are found in the datasets, we have explored the relation of the dataset extensively in order to minimize the missing values, as well as finding supporting reasons to retain the outliers. At last, we applied transformation and observe if there is any difference in normality in one of the variables in our dataset.</p>
+</div>
+<div id="selected-dataset---f1-from-kaggle" class="section level2">
+<h2>Selected Dataset - F1 from Kaggle</h2>
+<p>The dataset we used in this assignment is from an open source web site (<a href="https://www.kaggle.com" class="uri">https://www.kaggle.com</a>), details could be found at: <a href="https://www.kaggle.com/cjgdev/formula-1-race-data-19502017" class="uri">https://www.kaggle.com/cjgdev/formula-1-race-data-19502017</a>. This dataset contains all the formula one data from 1950 to 2017. It consists of 13 csv files. We are only looking into 6 of these files, which could provide all the relevant information to our research questions. Most of the variables in the files are self-explanatory. We are only listing those variables which require further explanations.</p>
+</div>
+<div id="research-question-1" class="section level2">
+<h2>Research Question 1</h2>
+<p>Who are the winner(s) for all the Grand Prix in 2017? Which constructor team do these winners belong to?</p>
+<p>results.csv - records all the racing results for each Grand Prix from 1950 - 2017. Variables: <em>totalmilliseconds</em> - stores the total time taken to finish all the laps in the entire Grand Prix for the particular driver.</p>
+<p>races.csv - records all the Grand Prix for different year. each Grand Prix is designated with a unique identifier, <em>circuitId</em>, and for each particular year, each Grand Prix would be assigned with a unique <em>raceId</em>. E.g. Australian Grand Prix has given circuitId=1, in 2017, it’s raceId is 969, in 2016, it’s raceId is 948. This file can be joined to the results file via <em>raceId</em>.</p>
+<p>drivers.csv - provides drivers information, this file can be joined to the results file via <em>driverId</em>. constructors.csv - provides the constructors information, this file can be joined to the results file via <em>constructorId</em>.</p>
+<p>status.csv - describes the exit status of the race, this file can be joined to the results file via <em>statusId</em>.</p>
+<p>lapTime.csv <Read in at the Scan I section > - records all the racing results for individual driver at particular Grand Prix for each single lap. Total sum of the <em>milliseconds</em> for each driver of a particular Grand Prix should equal to the <em>totalmilliseconds</em> in results file.</p>
+<pre class="r"><code>rm(list=ls())
+
+#Read-in all the csv files
+
+results &lt;- read.csv(&quot;src/R/data/f1/results.csv&quot;, stringsAsFactors = FALSE )
+races &lt;- read.csv(&quot;src/R/data/f1/races.csv&quot;, stringsAsFactors = FALSE)
+constructors &lt;- read.csv(&quot;src/R/data/f1/constructors.csv&quot;, stringsAsFactors = FALSE)
+status &lt;- read.csv(&quot;src/R/data/f1/status.csv&quot;, stringsAsFactors = FALSE)
+drivers &lt;- read.csv(&quot;src/R/data/f1/drivers.csv&quot;, stringsAsFactors = FALSE)
+
+#Filter to view 2017 races only 
+r &lt;- races %&gt;% filter( year == 2017)
+
+#Join the races table with results table, only 2017 records would be selected.  Then join with the constructor, status and drivers table to get relevant information. fOne2017 is our final result set which contain all the relevant information we can explore.
+
+rjoin &lt;- inner_join(r, results, by=&quot;raceId&quot;)
+rjoin2 &lt;- inner_join(rjoin, constructors, by=&quot;constructorId&quot;)
+rjoin3 &lt;- inner_join(rjoin2, status, by=&quot;statusId&quot;)
+fOne2017 &lt;- inner_join(rjoin3, drivers, by=&quot;driverId&quot;)
+
+#Re-define the names of the variables for clarity. Only the relevant variables are listed as below:
+names(fOne2017)[1] &lt;- &quot;raceId&quot;
+names(fOne2017)[2] &lt;- &quot;raceYear&quot;
+names(fOne2017)[5] &lt;- &quot;raceName&quot;
+names(fOne2017)[6] &lt;- &quot;raceDate&quot;
+names(fOne2017)[7] &lt;- &quot;raceURL&quot;
+names(fOne2017)[9] &lt;- &quot;driverId&quot;
+names(fOne2017)[10] &lt;- &quot;constructorId&quot;
+names(fOne2017)[14] &lt;- &quot;totalLapsDriverCompleted&quot;
+names(fOne2017)[15] &lt;- &quot;totalmilliseconds&quot;
+names(fOne2017)[17] &lt;- &quot;rank&quot;
+names(fOne2017)[18] &lt;- &quot;fastestLapTime&quot;
+names(fOne2017)[19] &lt;- &quot;fastestLapSpeed&quot;
+names(fOne2017)[20] &lt;- &quot;statusId&quot;
+names(fOne2017)[22] &lt;- &quot;constructorName&quot;
+names(fOne2017)[23] &lt;- &quot;constructorNationality&quot;
+names(fOne2017)[24] &lt;- &quot;constructorURL&quot;
+names(fOne2017)[25] &lt;- &quot;status&quot;
+names(fOne2017)[27] &lt;- &quot;driverCode&quot;
+names(fOne2017)[28] &lt;- &quot;driverFirstName&quot;
+names(fOne2017)[29] &lt;- &quot;driverSurName&quot;
+names(fOne2017)[30] &lt;- &quot;driverDOB&quot;
+names(fOne2017)[31] &lt;- &quot;driverNationality&quot;
+names(fOne2017)[32] &lt;- &quot;driverURL&quot;</code></pre>
+<div id="data-types-in-the-f1-dataset" class="section level3">
+<h3>Data types in the F1 Dataset</h3>
+<p>Variables are listed according to the below desired data types:</p>
+<p>int: raceId, raceYear, driverId, statusId, constructorId, totalmilliseconds</p>
+<p>numeric: fastestLapSpeed</p>
+<p>date: raceDate, driverDOB</p>
+<p>POSIXlt (time in minutes andseconds): fastestLapTime</p>
+<p>char: raceName, raceURL, constructorName, constructorNationality, constructorURL, driverCode, driverFirstName, driverSurName, driverNationality, driverURL</p>
+<p>factor: status</p>
+<p><em>status, fastestLapTime, raceDate, driverDOB, fastestLapSpeed</em> are all read-in as character, we need to convert them into proper data types as below:</p>
+<pre class="r"><code>fOne2017$status &lt;- factor(fOne2017$status, levels = c(&quot;Finished&quot;, &quot;Accident&quot;, &quot;Collision&quot;, &quot;Engine&quot;, &quot;Gearbox&quot;,&quot;Hydraulics&quot;,&quot;Electrical&quot;, &quot;+1 Lap&quot;, &quot;+2 Laps&quot;, &quot;+3 Laps&quot;, &quot;Suspension&quot;,&quot;Brakes&quot;, &quot;Driveshaft&quot;, &quot;Fuel pressure&quot;, &quot;Front wing&quot;, &quot;Water pressure&quot;, &quot;Wheel&quot;, &quot;Oil leak&quot;,&quot;Water leak&quot;, &quot;Oil pressure&quot;, &quot;Wheel nut&quot;,&quot;Vibrations&quot;,&quot;Battery&quot;, &quot;Spark plugs&quot;, &quot;Collision damage&quot;, &quot;Power Unit&quot;, &quot;Seat&quot;), ordered = TRUE)
+
+options(digits.secs=2) 
+fOne2017$fastestLapTime &lt;- ms(fOne2017$fastestLapTime)
+fOne2017$raceDate &lt;- dmy(fOne2017$raceDate)
+fOne2017$driverDOB &lt;- dmy(fOne2017$driverDOB)
+fOne2017$fastestLapSpeed &lt;- as.numeric(fOne2017$fastestLapSpeed)
+
+# Filter the fOne2017 data set on records with 1st ranking and only display the desired variables to answer our research question.
+
+win &lt;- fOne2017 %&gt;% filter(rank == 1)
+winfo &lt;- select(win, raceName, constructorName, driverFirstName, driverSurName, totalLapsDriverCompleted)
+
+head(winfo,20)</code></pre>
+<pre><code>##                    raceName constructorName driverFirstName driverSurName
+## 1     Australian Grand Prix         Ferrari            Kimi     Räikkönen
+## 2        Chinese Grand Prix        Mercedes           Lewis      Hamilton
+## 3        Bahrain Grand Prix        Mercedes           Lewis      Hamilton
+## 4        Russian Grand Prix         Ferrari            Kimi     Räikkönen
+## 5        Spanish Grand Prix        Mercedes           Lewis      Hamilton
+## 6         Monaco Grand Prix     Force India          Sergio         Pérez
+## 7       Canadian Grand Prix        Mercedes           Lewis      Hamilton
+## 8     Azerbaijan Grand Prix         Ferrari       Sebastian        Vettel
+## 9       Austrian Grand Prix        Mercedes           Lewis      Hamilton
+## 10       British Grand Prix        Mercedes           Lewis      Hamilton
+## 11     Hungarian Grand Prix         McLaren        Fernando        Alonso
+## 12       Belgian Grand Prix         Ferrari       Sebastian        Vettel
+## 13       Italian Grand Prix        Red Bull          Daniel     Ricciardo
+## 14     Singapore Grand Prix        Mercedes           Lewis      Hamilton
+## 15     Malaysian Grand Prix         Ferrari       Sebastian        Vettel
+## 16      Japanese Grand Prix        Mercedes        Valtteri        Bottas
+## 17 United States Grand Prix         Ferrari            Kimi     Räikkönen
+## 18       Mexican Grand Prix         Ferrari       Sebastian        Vettel
+## 19     Brazilian Grand Prix        Red Bull             Max    Verstappen
+## 20     Abu Dhabi Grand Prix        Mercedes        Valtteri        Bottas
+##    totalLapsDriverCompleted
+## 1                        57
+## 2                        56
+## 3                        57
+## 4                        52
+## 5                        66
+## 6                        78
+## 7                        70
+## 8                        51
+## 9                        71
+## 10                       51
+## 11                       70
+## 12                       44
+## 13                       53
+## 14                       58
+## 15                       56
+## 16                       53
+## 17                       56
+## 18                       71
+## 19                       71
+## 20                       55</code></pre>
+<p>The fOne2017 dataset is perfect and we can view all the relevant information of the winner(s) for all the Grand Prix in 2017. fOne2017 is a tidy dataset as: * Each variable has its own column. * Each observation has its own row. * Each value must has its own cell.</p>
+<p>However, we can reshape our data if we have another research question.</p>
+</div>
+</div>
+<div id="research-question-2" class="section level2">
+<h2>Research Question 2</h2>
+<p>Compare the results of the top 3 players for Japanese Grand Prix in Year 2016 and 2017.</p>
+<p>We could transform our dataset as below for proper investigation:</p>
+<pre class="r"><code>#Filter to view 2016 and 2017 Japanese Grand Prix race [circuitId is 22] 
+a &lt;- races %&gt;% filter( (year %in% c(2016, 2017)) &amp; (circuitId == 22))
+
+# Join the result table and select only the top 3 rankings, select the raceName, raceYear, totalLaps, ranking, totalmilliseconds as the relevant information. 
+ajoin &lt;- inner_join(a, results, by=&quot;raceId&quot;)
+top3 &lt;- ajoin %&gt;% filter(rank %in% c(1,2,3))
+top3 &lt;- select(top3, name, year, laps, rank, milliseconds)
+
+#Reshape the year into wide format 
+top3 &lt;- top3 %&gt;% spread(year, milliseconds)
+head(top3)</code></pre>
+<pre><code>##                  name laps rank    2016    2017
+## 1 Japanese Grand Prix   53    1 5223602 5261774
+## 2 Japanese Grand Prix   53    2 5209109 5283816
+## 3 Japanese Grand Prix   53    3 5237274 5260873</code></pre>
+<pre class="r"><code>#Introduce a new column diff in the top3 dataframe, which calculate the difference of the result time in 2017 and 2016 
+top3$diff &lt;- top3$`2017` - top3$`2016`
+
+#Write a function to return milliseconds into minutes and mutate the 2016, 2017 and diff columns accordingly.
+msTominutes &lt;- function(x){
+  return( round(x/60000,2) )
+}
+top3 &lt;- top3 %&gt;% mutate_at(.vars = vars(`2016`,`2017`, diff), .funs = msTominutes)
+
+#Print the top3 table again, it&#39;s more revealing after the unit is transformed to minutes and with proper column titles
+names(top3)[1] &lt;- &quot;raceName&quot;
+names(top3)[2] &lt;- &quot;totalLapsCompleted&quot;
+names(top3)[3] &lt;- &quot;rank&quot;
+names(top3)[4] &lt;- &quot;Year 2016&quot;
+names(top3)[5] &lt;- &quot;Year 2017&quot;
+names(top3)[6] &lt;- &quot;Diff (mins)&quot;
+head(top3)</code></pre>
+<pre><code>##              raceName totalLapsCompleted rank Year 2016 Year 2017 Diff (mins)
+## 1 Japanese Grand Prix                 53    1     87.06     87.70        0.64
+## 2 Japanese Grand Prix                 53    2     86.82     88.06        1.25
+## 3 Japanese Grand Prix                 53    3     87.29     87.68        0.39</code></pre>
+<div id="scan-i---missing-values" class="section level3">
+<h3>Scan I - Missing values</h3>
+<p>Scan the data for missing values, inconsistencies and obvious errors in the fOne2017 datasets. Steps and methodology are listed as below:</p>
+<pre class="r"><code># Create a function checkSumNA which will return total count of NA values for the pass-in variables 
+checkSumNA &lt;- function(x){
+    return(sum(is.na(x)))
+}
+
+#Use sapply to check all the variables in fOne2017 datasets, list out all the variables that have NA values.
+naList  &lt;- sapply(fOne2017, checkSumNA)
+naList &lt;- naList[(naList !=0)]
+naList</code></pre>
+<pre><code>## totalmilliseconds        fastestLap    fastestLapTime   fastestLapSpeed 
+##               235                24                24                24</code></pre>
+<pre class="r"><code># Examine the locations of NA Values, NAs of each variables all occur at the same observations
+sum((which(is.na(fOne2017$fastestLapTime)) == which(is.na(fOne2017$fastestLap))))</code></pre>
+<pre><code>## [1] 24</code></pre>
+<pre class="r"><code>sum((which(is.na(fOne2017$fastestLapSpeed)) == which(is.na(fOne2017$fastestLap))))</code></pre>
+<pre><code>## [1] 24</code></pre>
+<pre class="r"><code>sum((which(is.na(fOne2017$fastestLap)) %in% which(is.na(fOne2017$totalmilliseconds))))</code></pre>
+<pre><code>## [1] 24</code></pre>
+<pre class="r"><code># Check the status value for the observations with NAs value in totalmilliseconds, NAs values are found only from those non-finished laps.
+fOne2017NoMS &lt;- fOne2017[is.na(fOne2017$totalmilliseconds),]
+unique(fOne2017NoMS$status)</code></pre>
+<pre><code>##  [1] +1 Lap           +2 Laps          Vibrations       Suspension      
+##  [5] Brakes           Power Unit       Hydraulics       Water leak      
+##  [9] Driveshaft       Fuel pressure    Accident         Collision       
+## [13] Gearbox          Electrical       Collision damage Water pressure  
+## [17] Seat             Oil pressure     Battery          +3 Laps         
+## [21] Engine           Oil leak         Wheel nut        Wheel           
+## [25] Front wing       Spark plugs     
+## 27 Levels: Finished &lt; Accident &lt; Collision &lt; Engine &lt; ... &lt; Seat</code></pre>
+<pre class="r"><code># lapTime file - shows the finishing time for each laps - let&#39;s look into this file and filter only for the races in 2017, create the result as a lap2017 dataset. 
+setwd(&quot;D:/RMIT Master of Analytics/semester 1/MATH2349 Data Preprocessing/Assignment 3/formula1/&quot;)
+lap &lt;- read.csv(&quot;lapTimes.csv&quot;, stringsAsFactors = FALSE)
+raceId2017 &lt;- unique(fOne2017$raceId)
+lap2017 &lt;- lap %&gt;% filter(raceId %in% raceId2017)
+lap2017&lt;- mutate(lap2017, minutes =msTominutes(milliseconds))
+
+#Check if there is any missing values in the lap2017 dataset.
+lapNaList  &lt;- sapply(lap2017, checkSumNA)
+lapNaList &lt;- lapNaList[(lapNaList !=0)]
+lapNaList</code></pre>
+<pre><code>## named integer(0)</code></pre>
+<pre class="r"><code>#Since all the missing totalmilliseconds in fOne2017 are caused by observations with non-finished status, let&#39;s add a categorical factor, isFinished to fOne2017 dataset.  If the exit status=&quot;Finished&quot;, isFinished = TRUE, otherwise isFinished = FALSE.  Add the status info in lap2017 dataset as well for further analysis. 
+
+fOne2017 &lt;- mutate(fOne2017, isFinished = ifelse( (status ==  &quot;Finished&quot;), 1, 0))
+fOne2017$isFinished &lt;- factor(fOne2017$isFinished, levels=c(1, 0), labels = c(TRUE, FALSE))
+table(fOne2017$isFinished)</code></pre>
+<pre><code>## 
+##  TRUE FALSE 
+##   165   235</code></pre>
+<pre class="r"><code>fOne2017Status &lt;- select(fOne2017, raceId, driverId, status, isFinished)
+lap2017 &lt;- inner_join(lap2017, fOne2017Status, by = c(&quot;raceId&quot;, &quot;driverId&quot;)) 
+
+
+#Compare the sum of milliseconds from the lap2017 dataset to the totalmilliseconds in fOne2017 dataset and observe any differences
+lapSumMSbyRaceDriver &lt;-  lap2017 %&gt;% group_by (raceId, driverId) %&gt;% 
+  summarise(sumMSLapFile = sum(milliseconds))
+
+
+fOne2017 &lt;- left_join(fOne2017, lapSumMSbyRaceDriver, by = c(&quot;raceId&quot;, &quot;driverId&quot;))
+fOne2017 &lt;- mutate(fOne2017, diffSum = sumMSLapFile - totalmilliseconds, minutes = msTominutes(sumMSLapFile))
+
+table(fOne2017$diffSum)</code></pre>
+<pre><code>## 
+## -5000     0 
+##     1   164</code></pre>
+<p>The calculated sum is different for 1 out of 165 observations [0.6%]. The difference is 5000 milliseconds, which is 5 seconds. Since the difference is relatively small, we could rely on the newly added “sumMSLapFile” and “minutes” variable to observe the racing results instead of the “totalmilliseconds” column.</p>
+<p>Use sapply to check all the variables in fOne2017 datasets again, list out all the variables that have NA values. There are 20 out of 400 observatiions [5%] with missing values.</p>
+<pre class="r"><code>naList  &lt;- sapply(fOne2017, checkSumNA)
+naList &lt;- naList[(naList !=0)]
+naList</code></pre>
+<pre><code>## totalmilliseconds        fastestLap    fastestLapTime   fastestLapSpeed 
+##               235                24                24                24 
+##      sumMSLapFile           diffSum           minutes 
+##                20               235                20</code></pre>
+<p>Inspect the exit status of these 20 records, 6 racing status are shown as below:</p>
+<pre class="r"><code>fOne2017NoSumMS &lt;- fOne2017[is.na(fOne2017$sumMSLapFile),]
+unique(fOne2017NoSumMS$status)</code></pre>
+<pre><code>## [1] Collision        Power Unit       Collision damage Hydraulics      
+## [5] Accident         Battery         
+## 27 Levels: Finished &lt; Accident &lt; Collision &lt; Engine &lt; ... &lt; Seat</code></pre>
+<p>The following histogram is plotted to show the total racing minutes distributon of Grand Prix in 2017. By understanding and exploring the data in a deeper way, we can find out the missing values from other related table in the dataset sensibly. Number of missing values for this dataset has been reduced from 235 (58.75%) to 20 records (5%). It’s best not to overwrite the existing information, instead we have introduced a new column <em>sumMSLapFile</em> to complement the missing gaps of the original data.</p>
+<pre class="r"><code>ggplot(fOne2017, aes(x = minutes)) + ggtitle(&quot;Histogram on distribution of total racing minutes for Grand Prix in 2017&quot;) +
+  geom_histogram(aes(color = isFinished, fill = isFinished), 
+                 position = &quot;identity&quot;, bins = 30, alpha = 0.4) +
+  scale_color_manual(values = c(&quot;#00AFBB&quot;, &quot;#E7B800&quot;)) +
+  scale_fill_manual(values = c(&quot;#00AFBB&quot;, &quot;#E7B800&quot;))</code></pre>
+<p><img src="R_2_F1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#</code></pre>
+</div>
+<div id="scan-ii---outliers" class="section level3">
+<h3>Scan II - Outliers</h3>
+<p>As all the racing results are originated from the lapTime file, let’s look at the outliers racing minutes (minutes is easier for reader to interpret instead of milliseconds) of each lap in this dataset</p>
+<pre class="r"><code># Draw the box plot diagrams
+nrow(lap2017)</code></pre>
+<pre><code>## [1] 20307</code></pre>
+<pre class="r"><code>box2017Lap &lt;- lap2017 %&gt;% boxplot(minutes~isFinished, data=., main=&quot;Box Plot of racing minutes of each lap in 2017 Formula One&quot;)</code></pre>
+<p><img src="R_2_F1_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Zoom the box plot diagrams closer to exclude the extreme outliers
+box2017Lap &lt;- lap2017 %&gt;% boxplot(minutes~isFinished, data=., ylim=c(0,6), main=&quot;Box Plot of racing minutes of each lap in 2017 Formula One\n &lt;Zoom closer to exclude the extreme outliers&gt;&quot;)</code></pre>
+<p><img src="R_2_F1_files/figure-html/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s use binning <also known as Discretisation> to examine the distribution of the outliers:</p>
+<pre class="r"><code>lapOutBinned&lt;-discretize(box2017Lap$out, disc = &quot;equalwidth&quot;)
+table(lapOutBinned)</code></pre>
+<pre><code>## lapOutBinned
+##   1   8   9 
+## 759  15   2</code></pre>
+<pre class="r"><code>#Use the cut function to examine the range of each bin.
+bins&lt;-9
+minimumVal&lt;-min(box2017Lap$out)
+minimumVal</code></pre>
+<pre><code>## [1] 2.15</code></pre>
+<pre class="r"><code>maximumVal&lt;-max(box2017Lap$out)
+maximumVal</code></pre>
+<pre><code>## [1] 28.4</code></pre>
+<pre class="r"><code>width=(maximumVal-minimumVal)/bins;
+
+table(cut(box2017Lap$out, breaks=seq(minimumVal, maximumVal, width), include.lowest = TRUE))</code></pre>
+<pre><code>## 
+## [2.15,5.07] (5.07,7.98] (7.98,10.9] (10.9,13.8] (13.8,16.7] (16.7,19.6] 
+##         759           0           0           0           0           0 
+## (19.6,22.6] (22.6,25.5] (25.5,28.4] 
+##           0          15           2</code></pre>
+<pre class="r"><code>length(box2017Lap$out)</code></pre>
+<pre><code>## [1] 776</code></pre>
+<p>Let’s find out the reason behind all the extreme values</p>
+<pre class="r"><code>#Filter the lap2017 with all the extreme values
+lap2017MinGT20 &lt;-  lap2017 %&gt;% filter(minutes &gt; 20 )
+
+#Link with race file to find out the Grand Prix for all the occurences of the extreme outliers
+lap2017MinGT20 &lt;- inner_join(lap2017MinGT20, fOne2017, by=c(&quot;raceId&quot;, &quot;driverId&quot;))
+lap2017MinGT20 &lt;- lap2017MinGT20 %&gt;% select(&quot;raceId&quot;, &quot;raceName&quot;, &quot;lap&quot;, &quot;driverFirstName&quot;, &quot;driverSurName&quot;, &quot;minutes.x&quot;, &quot;status.x&quot;)
+head(lap2017MinGT20, 17)</code></pre>
+<pre><code>##    raceId              raceName lap driverFirstName driverSurName minutes.x
+## 1     976 Azerbaijan Grand Prix  23           Lewis      Hamilton     24.66
+## 2     976 Azerbaijan Grand Prix  23       Sebastian        Vettel     24.63
+## 3     976 Azerbaijan Grand Prix  21          Sergio         Pérez     28.40
+## 4     976 Azerbaijan Grand Prix  21            Kimi     Räikkönen     28.26
+## 5     976 Azerbaijan Grand Prix  23          Felipe         Massa     24.61
+## 6     976 Azerbaijan Grand Prix  23         Esteban          Ocon     24.28
+## 7     976 Azerbaijan Grand Prix  23           Lance        Stroll     24.59
+## 8     976 Azerbaijan Grand Prix  23          Daniel     Ricciardo     24.56
+## 9     976 Azerbaijan Grand Prix  23            Nico   HÌ_lkenberg     24.53
+## 10    976 Azerbaijan Grand Prix  23           Kevin     Magnussen     24.51
+## 11    976 Azerbaijan Grand Prix  23          Pascal      Wehrlein     24.25
+## 12    976 Azerbaijan Grand Prix  23          Romain      Grosjean     24.43
+## 13    976 Azerbaijan Grand Prix  23          Marcus      Ericsson     24.39
+## 14    976 Azerbaijan Grand Prix  23         Stoffel     Vandoorne     24.36
+## 15    976 Azerbaijan Grand Prix  23        Fernando        Alonso     24.49
+## 16    976 Azerbaijan Grand Prix  23          Carlos         Sainz     24.46
+## 17    976 Azerbaijan Grand Prix  23        Valtteri        Bottas     24.32
+##          status.x
+## 1        Finished
+## 2        Finished
+## 3            Seat
+## 4  Water pressure
+## 5      Suspension
+## 6        Finished
+## 7        Finished
+## 8        Finished
+## 9        Accident
+## 10       Finished
+## 11       Finished
+## 12         +1 Lap
+## 13       Finished
+## 14       Finished
+## 15       Finished
+## 16       Finished
+## 17       Finished</code></pre>
+<pre class="r"><code>unique(lap2017MinGT20[c(&quot;raceId&quot;, &quot;raceName&quot;)])</code></pre>
+<pre><code>##   raceId              raceName
+## 1    976 Azerbaijan Grand Prix</code></pre>
+<p>From web-search, the Azerbaijan Grand Prix was red-flagged on lap 22 for over 20 minutes <a href="https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix" class="uri">https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix</a>, this could explain the reasons of these extreme outliers.</p>
+<pre class="r"><code>#percentage of outliers
+776/20307</code></pre>
+<pre><code>## [1] 0.03821342</code></pre>
+<p>Only 3.82% (&lt; 5% ) of the values are outliers, and if we inspect the data, all the non-extreme outliers fall below 5.07 minutes, which is still a reasonable completion time for a single racing lap if minor incidents occur. With the small precentage of outliers and supporting reason on completion time, it’s safe and reflecting the truth of the dataset if we retain the outliers.</p>
+<p>Furthermore, We could tag the outliers back into the lap2017 dataset if we need further investigation.</p>
+<pre class="r"><code># Find out the lowest outlier values for both isFinished=TRUE and isFinished=FALSE group  
+lapOut &lt;- data.frame(group=box2017Lap$group, out=box2017Lap$out)
+trueOut&lt;- lapOut[lapOut$group==1,]
+falseOut &lt;- lapOut[lapOut$group==2,]
+minTrue&lt;-min(trueOut$out)
+minFalse&lt;-min(falseOut$out)
+
+#Create a new column in the lap2017 dataset.  Give it a tag &quot;outTrue&quot;, if it&#39;s an outlier for the isFinished=TRUE group, give it a tag &quot;outFalse, it it&#39;s an outlier for the isFinished=FALSE group, otherwise mark it as &#39;NA&#39;
+
+lap2017 &lt;- mutate(lap2017, outlier = ifelse(((isFinished == TRUE) &amp; ( minutes &gt;= minTrue)), &#39;outTrue&#39;, (ifelse(((isFinished == FALSE) &amp; ( minutes &gt;= minFalse)), &#39;outFalse&#39;, &#39;NA&#39; ))))</code></pre>
+</div>
+</div>
+<div id="data-transformation" class="section level2">
+<h2>Data Transformation</h2>
+<p>Let’s plot racing minutes for each lap in lap2017 and see how the data is distributed.</p>
+<pre class="r"><code>hist(lap2017$minutes, breaks=1000)</code></pre>
+<p><img src="R_2_F1_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Removing the extreme outliers, the graph would be less spread out.
+lap2017NoExtreme &lt;-  lap2017 %&gt;% filter(minutes &lt; 20 )
+hist(lap2017NoExtreme$minutes, breaks=1000)</code></pre>
+<p><img src="R_2_F1_files/figure-html/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>As the distribution is right-skewed, let’s see if data transformation can reduce the skewness and normalized the distribution.</p>
+<pre class="r"><code>par(mfrow=c(2,3))
+
+#Log Base 10
+l10_lap2017M&lt;- log10(lap2017NoExtreme$minutes)
+hist(l10_lap2017M, breaks = 1000)
+
+#Log Base e
+le_lap2017M&lt;- log(lap2017NoExtreme$minutes)
+hist(le_lap2017M, breaks = 10000)
+
+#SQRT
+sqrt_lap2017M&lt;- sqrt(lap2017NoExtreme$minutes)
+hist(sqrt_lap2017M, breaks = 1000)
+
+#reciporcal
+re_lap2017M&lt;- (1/lap2017NoExtreme$minutes)
+hist(re_lap2017M, breaks = 1000)
+
+
+#Box cox
+bc_lap2017M&lt;- BoxCox(lap2017NoExtreme$minutes, lambda = &quot;auto&quot;)
+hist(bc_lap2017M, breaks = 1000)</code></pre>
+<p><img src="R_2_F1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>None of the graphs show any difference in normality. Let’s use ks.test to check if there is any statistically significance improvement.</p>
+<pre class="r"><code>ks.test(lap2017NoExtreme$minutes, &quot;pnorm&quot;, mean=mean(lap2017NoExtreme$minutes), sd=sd(lap2017NoExtreme$minutes))</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  lap2017NoExtreme$minutes
+## D = 0.10807, p-value &lt; 2.2e-16
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>ks.test(l10_lap2017M, &quot;pnorm&quot;, mean=mean(l10_lap2017M), sd=sd(l10_lap2017M))</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  l10_lap2017M
+## D = 0.06506, p-value &lt; 2.2e-16
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>ks.test(le_lap2017M, &quot;pnorm&quot;, mean=mean(le_lap2017M), sd=sd(le_lap2017M))</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  le_lap2017M
+## D = 0.06506, p-value &lt; 2.2e-16
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>ks.test(sqrt_lap2017M, &quot;pnorm&quot;, mean=mean(sqrt_lap2017M), sd=sd(sqrt_lap2017M))</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  sqrt_lap2017M
+## D = 0.084924, p-value &lt; 2.2e-16
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>ks.test(re_lap2017M, &quot;pnorm&quot;, mean=mean(re_lap2017M), sd=sd(re_lap2017M))</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  re_lap2017M
+## D = 0.067411, p-value &lt; 2.2e-16
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>ks.test(bc_lap2017M, &quot;pnorm&quot;, mean=mean(bc_lap2017M), sd=sd(bc_lap2017M))</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  bc_lap2017M
+## D = 0.067409, p-value &lt; 2.2e-16
+## alternative hypothesis: two-sided</code></pre>
+<p>From the One-sample Kolmogorov-Smirnov test, there is statistical significance that the data is not noramlly distributed. Even after the loge, 1og10, sqrt, reciprocal or Box Cox transformation, there is still no change on the statistical significance, data is still not normally distributed.</p>
+<p><br> <br></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

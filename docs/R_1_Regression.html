@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Bike Rental Investigation - Applying Regression</title>
+
+<script src="site_libs/header-attrs-2.3.2/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fas fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-r-project"></span>
+     
+    R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="R.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Statistic</li>
+    <li>
+      <a href="R_1_Normal.html">Normal Distribution</a>
+    </li>
+    <li>
+      <a href="R_1_T-test.html">Paired T-test</a>
+    </li>
+    <li>
+      <a href="R_1_Regression.html">Regression</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Wrangling</li>
+    <li>
+      <a href="R_2_Weather.html">Exploring Data Structure</a>
+    </li>
+    <li>
+      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+    </li>
+    <li>
+      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-python"></span>
+     
+    Python
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Python.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Analysis &amp; Modelling</li>
+    <li>
+      <a href="Python_1_StarWars.html">Star Wars</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Machine Learning</li>
+    <li>
+      <a href="Python_2_KNN.html">Data Preparation and KNN</a>
+    </li>
+    <li>
+      <a href="Python_2_DT.html">Decision Tree</a>
+    </li>
+    <li>
+      <a href="Python_2_NB.html">Naive Bayes</a>
+    </li>
+    <li>
+      <a href="Python_2_model.html">Model Evaluation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-stripe-s"></span>
+     
+    SAS
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="SAS.html">Overview</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa-chart-bar"></span>
+     
+    Power BI
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="PowerBI.html">Overview</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/milliewoo/portfolio">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Bike Rental Investigation - Applying Regression</h1>
+
+</div>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Bike sharing programs are high in demand these days. The benefits of bike sharing include reducing pollution, traffic, travel costs and dependence on oil, while improving public health. This study is intended to understand how environmental factors such as temperature promote or hinder public bike sharing.</p>
+</div>
+<div id="problem-statement" class="section level2">
+<h2>Problem Statement</h2>
+<p>The goal is to determine whether bike renting is affected by outside temperature. A simple linear regression model is the type of model that best describes the relationship between temperature and number of rented bikes.</p>
+<div id="data-1" class="section level3">
+<h3>Data 1</h3>
+<p>The dataset (day.csv) was obtained from UCI Machine Learning Repository. The URL for the dataset is as follows: <a href="https://archive.ics.uci.edu/ml/datasets/Bike+Sharing+Dataset" class="uri">https://archive.ics.uci.edu/ml/datasets/Bike+Sharing+Dataset</a> The variables in the dataset are as follows:</p>
+<ul>
+<li>instant: record index</li>
+<li>dteday : date</li>
+<li>season : season (1:springer, 2:summer, 3:fall, 4:winter)</li>
+<li>yr : year (0: 2011, 1:2012)</li>
+<li>mnth : month ( 1 to 12)</li>
+<li>holiday : weather day is holiday or not (extracted from <a href="http://dchr.dc.gov/page/holiday-schedule" class="uri">http://dchr.dc.gov/page/holiday-schedule</a>)</li>
+<li>weekday : day of the week</li>
+<li>workingday : if day is neither weekend nor holiday is 1, otherwise is 0</li>
+<li>weathersit : season (1: Clear, Few clouds, Partly cloudy, Partly cloudy, 2: Mist + Cloudy, Mist + Broken clouds, Mist + Few clouds, Mist, 3: Light Snow, Light Rain + Thunderstorm + Scattered clouds, Light Rain + Scattered clouds, 4: Heavy Rain + Ice Pallets + Thunderstorm + Mist, Snow + Fog)</li>
+</ul>
+</div>
+<div id="data-2" class="section level3">
+<h3>Data 2</h3>
+<ul>
+<li>temp : Normalized temperature in Celsius. The values are derived via (t-t_min)/(t_max-t_min), t_min=-8, t_max=+39 (only in hourly scale)</li>
+<li>atemp : Normalized feeling temperature in Celsius. The values are derived via (t-t_min)/(t_max-t_min), t_min=-16, t_max=+50 (only in hourly scale)</li>
+<li>hum : Normalized humidity. The values are divided to 100 (max)</li>
+<li>windspeed : Normalized wind speed. The values are divided to 67 (max)</li>
+<li>casual : count of casual users</li>
+<li>registered : count of registered users</li>
+<li>cnt : count of rental bikes including casual and registered</li>
+</ul>
+<p>The variables we are dealing with are temp and cnt.</p>
+</div>
+</div>
+<div id="descriptive-statistics-and-visualisation-1" class="section level2">
+<h2>Descriptive Statistics and Visualisation 1</h2>
+<ul>
+<li>Read the data</li>
+</ul>
+<pre class="r"><code>#Read the data
+day &lt;- read_csv(&quot;src/R/stats/day.csv&quot;)
+head(day)</code></pre>
+<pre><code>## # A tibble: 6 x 16
+##   instant dteday     season    yr  mnth holiday weekday workingday weathersit
+##     &lt;dbl&gt; &lt;date&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1       1 2011-01-01      1     0     1       0       6          0          2
+## 2       2 2011-01-02      1     0     1       0       0          0          2
+## 3       3 2011-01-03      1     0     1       0       1          1          1
+## 4       4 2011-01-04      1     0     1       0       2          1          1
+## 5       5 2011-01-05      1     0     1       0       3          1          1
+## 6       6 2011-01-06      1     0     1       0       4          1          1
+## # ... with 7 more variables: temp &lt;dbl&gt;, atemp &lt;dbl&gt;, hum &lt;dbl&gt;,
+## #   windspeed &lt;dbl&gt;, casual &lt;dbl&gt;, registered &lt;dbl&gt;, cnt &lt;dbl&gt;</code></pre>
+<pre class="r"><code>#Summary statistics
+day %&gt;% summarise( Var = &quot;Temperature&quot;, Min = min(temp,na.rm = TRUE)%&gt;% round(3),
+                                           Q1 = quantile(temp,probs = .25,na.rm = TRUE)%&gt;% round(3),
+                                           Median = median(temp, na.rm = TRUE)%&gt;% round(3),
+                                           Q3 = quantile(temp,probs = .75,na.rm = TRUE)%&gt;% round(3),
+                                           Max = max(temp,na.rm = TRUE)%&gt;% round(3),
+                                           Mean = mean(temp, na.rm = TRUE)%&gt;% round(3),
+                                           SD = sd(temp, na.rm = TRUE)%&gt;% round(3),
+                                           n = n(),
+                                           Missing = sum(is.na(temp))) -&gt; table1
+
+day %&gt;% summarise( Var = &quot;Count of Bike Rentals&quot;, Min = min(cnt,na.rm = TRUE),
+                                           Q1 = quantile(cnt,probs = .25,na.rm = TRUE),
+                                           Median = median(cnt, na.rm = TRUE),
+                                           Q3 = quantile(cnt,probs = .75,na.rm = TRUE),
+                                           Max = max(cnt,na.rm = TRUE),
+                                           Mean = mean(cnt, na.rm = TRUE),
+                                           SD = sd(cnt, na.rm = TRUE),
+                                           n = n(),
+                                           Missing = sum(is.na(cnt))) -&gt; table2
+knitr::kable(rbind(table1,table2))%&gt;% kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;, &quot;scale_down&quot;)) </code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Var
+</th>
+<th style="text-align:right;">
+Min
+</th>
+<th style="text-align:right;">
+Q1
+</th>
+<th style="text-align:right;">
+Median
+</th>
+<th style="text-align:right;">
+Q3
+</th>
+<th style="text-align:right;">
+Max
+</th>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+SD
+</th>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+Missing
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Temperature
+</td>
+<td style="text-align:right;">
+0.059
+</td>
+<td style="text-align:right;">
+0.337
+</td>
+<td style="text-align:right;">
+0.498
+</td>
+<td style="text-align:right;">
+0.655
+</td>
+<td style="text-align:right;">
+0.862
+</td>
+<td style="text-align:right;">
+0.495
+</td>
+<td style="text-align:right;">
+0.183
+</td>
+<td style="text-align:right;">
+731
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Count of Bike Rentals
+</td>
+<td style="text-align:right;">
+22.000
+</td>
+<td style="text-align:right;">
+3152.000
+</td>
+<td style="text-align:right;">
+4548.000
+</td>
+<td style="text-align:right;">
+5956.000
+</td>
+<td style="text-align:right;">
+8714.000
+</td>
+<td style="text-align:right;">
+4504.349
+</td>
+<td style="text-align:right;">
+1937.211
+</td>
+<td style="text-align:right;">
+731
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>There are no missing values in the variables temperature and count of rental bikes.</p>
+<div id="outliers" class="section level3">
+<h3>Outliers</h3>
+<p>The mvn() function can be used to detect multivariate outliers of the variables.</p>
+<pre class="r"><code>daytempcnt &lt;- day[,c(&quot;temp&quot;,&quot;cnt&quot;)]
+results &lt;- mvn(data = daytempcnt, multivariateOutlierMethod = &quot;quan&quot;, showOutliers = TRUE,showNewData = TRUE)</code></pre>
+<p><img src="R_1_Regression_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>results$multivariateOutliers</code></pre>
+<pre><code>##   Observation Mahalanobis Distance Outlier
+## 1           1                9.756    TRUE
+## 2           2                8.223    TRUE
+## 3           3                7.889    TRUE</code></pre>
+<pre class="r"><code>daytempcntdata &lt;-results$newData</code></pre>
+<p>There are 3 outliers in the dataset. We will be removing the 3 outliers and use the rest of the dataset for the analysis.</p>
+</div>
+</div>
+<div id="decsriptive-statistics-and-visualisation-2" class="section level2">
+<h2>Decsriptive Statistics and Visualisation 2</h2>
+<pre class="r"><code>plot(cnt~temp, data = daytempcntdata,ylab=&quot;No.of Bike Rentals&quot;, xlab=&quot;Temperature&quot;, main=&quot;Bike Rentals by Temperature&quot;)</code></pre>
+<p><img src="R_1_Regression_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /> The scatter plot shows that the two variables have some linearity. A simple linear regression was performed on the two variables without the outliers.</p>
+<div id="simple-linear-regression-assumption-1" class="section level3">
+<h3>Simple Linear Regression Assumption 1</h3>
+<ul>
+<li>Residual vs Fitted</li>
+</ul>
+<pre class="r"><code>model1 &lt;- lm(cnt ~ temp, data = daytempcntdata)
+plot(model1,which = 1)</code></pre>
+<p><img src="R_1_Regression_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /> The relationship between fitted values and residuals is flat (look at the red line), this is a good indication that the relationship between temperature and number of bikes rented is linear. In the plot above, the variance appears to remain the same. Therefore,we can assume homoscedasticity.</p>
+</div>
+<div id="simple-linear-regression-assumption-2" class="section level3">
+<h3>Simple Linear Regression Assumption 2</h3>
+<ul>
+<li>Normal Q-Q</li>
+</ul>
+<pre class="r"><code>plot(model1,which = 2)</code></pre>
+<p><img src="R_1_Regression_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /> The above plot suggests that there is no significant deviation from normality. It would be safe to assume that the residuals are approximately distributed normally.</p>
+</div>
+<div id="simple-linear-regression-assumption-3" class="section level3">
+<h3>Simple Linear Regression Assumption 3</h3>
+<ul>
+<li>Scale-Location</li>
+</ul>
+<pre class="r"><code>plot(model1,which = 3)</code></pre>
+<p><img src="R_1_Regression_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /> The red line is nearly flat and the variance in the square root of the standardised residuals is consistent across predicted (fitted values).</p>
+</div>
+<div id="simple-linear-regression-assumption-4" class="section level3">
+<h3>Simple Linear Regression Assumption 4</h3>
+<ul>
+<li>Residual vs Leverage</li>
+</ul>
+<pre class="r"><code>plot(model1,which = 5)</code></pre>
+<p><img src="R_1_Regression_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /> The above plot shows that there are no evidence of influencial cases.</p>
+</div>
+</div>
+<div id="simple-linear-regression-summary" class="section level2">
+<h2>Simple Linear Regression Summary</h2>
+<pre class="r"><code>model1 %&gt;% summary()</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = cnt ~ temp, data = daytempcntdata)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4615.9 -1141.0   -89.1  1050.1  3730.9 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1246.2      161.4   7.722 3.79e-14 ***
+## temp          6595.2      305.2  21.611  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1505 on 726 degrees of freedom
+## Multiple R-squared:  0.3915, Adjusted R-squared:  0.3906 
+## F-statistic:   467 on 1 and 726 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The <span class="math inline">\(R^2\)</span> for the above regression suggests that normalised temperature explains 39% of the variabiltiy in number of bikes rented.</p>
+</div>
+<div id="hypthesis-testing-1" class="section level2">
+<h2>Hypthesis Testing 1</h2>
+<p>The model summary also recorded a F statistic which is used to assess the regression model. F-test has statistical hypotheses as follows:</p>
+<p><span class="math display">\[H_0: The \ data \ do \ not \ fit \ the \ linear \ regression \ model \]</span></p>
+<p><span class="math display">\[H_A: The \ data \ fit \ the \ linear \ regression \ model\]</span> The p-value for the F-Test reported in the model summary is &lt;.001. Therefore,we reject <span class="math inline">\(H_{0}\)</span>.There was statistically significant evidence that the data fit a linear regression model.</p>
+</div>
+<div id="hypthesis-testing-2" class="section level2">
+<h2>Hypthesis Testing 2</h2>
+<p>We set the following statistical hypotheses to check the statistical significance of the intercept:</p>
+<p><span class="math display">\[H_0: \alpha=0\ \]</span> <span class="math display">\[H_A: \alpha\ne0\ \]</span> This hypothesis is tested using a t statistic, reported as t=7.722,p &lt; .001. The intercept is statistically significant at the 0.05 level. This means statistically significant evidence exists that the intercept is not 0.</p>
+<pre class="r"><code>model1 %&gt;% confint()</code></pre>
+<pre><code>##                 2.5 %   97.5 %
+## (Intercept)  929.3755 1563.001
+## temp        5996.0335 7194.287</code></pre>
+<p><span class="math inline">\(H_0: \alpha=0\ \)</span> was not captured by the confidence interval. Therefore, we reject it.</p>
+</div>
+<div id="hypthesis-testing-3" class="section level2">
+<h2>Hypthesis Testing 3</h2>
+<p>The hypothesis test of the slope is as follows:</p>
+<p><span class="math display">\[H_0: \beta=0\ \]</span></p>
+<p><span class="math display">\[H_A: \beta\ne0\ \]</span> The slope was also tested using a t statistic which was reported as t=21.611,p &lt; .001. As p&lt;0.05, we reject <span class="math inline">\(H_0\)</span>. Looking at the confint() function, the 95% confidence interval does not capture 0. Therefore, we reject <span class="math inline">\(H_0\)</span>. There is statistically significant evidence that temperature is positively related to number of bikes rented.</p>
+</div>
+<div id="simple-linear-regression" class="section level2">
+<h2>Simple Linear Regression</h2>
+<pre class="r"><code>plot(cnt~temp, data = daytempcntdata)
+abline(model1,col=&quot;red&quot;)</code></pre>
+<p><img src="R_1_Regression_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /> A linear regression model was fitted with a single predictor,temperature, to estimate the dependent variable,count of bikes rented. A scatter plot testing the bivariate relationship between temperature and count was examined before fitting the regression. A positive linear relationship was shown by the scatter plot. Other non-linear trends were omitted. The overall regression model was statistically significant, F(1,726)=426, p&lt; .001, and explained 39% of the variability in count of bikes, <span class="math inline">\(R^2\)</span>=.39. The estimated regression equation was cnt=1246.2+.6595.2∗temp. The positive slope for temperature was statistically significant, b=6595.2, t=21.611, p&lt;.001, 95% CI [5996.0335,7194.287]. Final inspection of the residuals supported normality and homoscedasticity.</p>
+</div>
+<div id="discussion" class="section level2">
+<h2>Discussion</h2>
+<p>The positive linear relationship between temperature and bike rental count shows that higher the temperature, higher the bike rental count. The warm weather promotes the use of public bikes.</p>
+<p>It would be very interesting, if we could extend our research to other factors, such as humidity and windspeed and explore if these factors could also impose any inference on bike rental. We could also investigate if there is any difference in weather influence on bike rental in different metropolitan cities and make statistical comparisons. The research question can roll on extensively base on the above preliminary findings.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Original Source: <a href="http://capitalbikeshare.com/system-data" class="uri">http://capitalbikeshare.com/system-data</a></p>
+<p>Weather Information: <a href="http://www.freemeteo.com" class="uri">http://www.freemeteo.com</a></p>
+<p>Holiday Schedule: <a href="http://dchr.dc.gov/page/holiday-schedule" class="uri">http://dchr.dc.gov/page/holiday-schedule</a></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

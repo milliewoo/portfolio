@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Exploring Data Structure - Weather records from Bureau of Meteorology</title>
+
+<script src="site_libs/header-attrs-2.3.2/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fas fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-r-project"></span>
+     
+    R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="R.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Statistic</li>
+    <li>
+      <a href="R_1_Normal.html">Normal Distribution</a>
+    </li>
+    <li>
+      <a href="R_1_T-test.html">Paired T-test</a>
+    </li>
+    <li>
+      <a href="R_1_Regression.html">Regression</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Wrangling</li>
+    <li>
+      <a href="R_2_Weather.html">Exploring Data Structure</a>
+    </li>
+    <li>
+      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+    </li>
+    <li>
+      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-python"></span>
+     
+    Python
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Python.html">Overview</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Analysis &amp; Modelling</li>
+    <li>
+      <a href="Python_1_StarWars.html">Star Wars</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Machine Learning</li>
+    <li>
+      <a href="Python_2_KNN.html">Data Preparation and KNN</a>
+    </li>
+    <li>
+      <a href="Python_2_DT.html">Decision Tree</a>
+    </li>
+    <li>
+      <a href="Python_2_NB.html">Naive Bayes</a>
+    </li>
+    <li>
+      <a href="Python_2_model.html">Model Evaluation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fab fa-stripe-s"></span>
+     
+    SAS
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="SAS.html">Overview</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa-chart-bar"></span>
+     
+    Power BI
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="PowerBI.html">Overview</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/milliewoo/portfolio">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Exploring Data Structure - Weather records from Bureau of Meteorology</h1>
+
+</div>
+
+
+<div id="data-description" class="section level2">
+<h2>Data Description</h2>
+<p>I went to Falls Creek for a ski trip before the Master course commenced. During my 3 days and 2 nights stay, the weather was pretty bad. I would like to understand more about the data structure of weather records from Bureau of Meteorology. I downloaded the data file “IDCJDW3027.201907.csv” (which recorded the July 2019 weather records in Falls Creek) and read that into R.</p>
+<p>My data set includes:</p>
+<ul>
+<li>numeric variables, below columns are all numeric variables:
+<ul>
+<li>Min Temp</li>
+<li>Max Temp</li>
+<li>Rainfall (mm)</li>
+<li>Speed of maximum wind gust (km/h)</li>
+<li>9am Temperature</li>
+<li>9am relative humidity</li>
+<li>3pm Temperature</li>
+<li>3pm relative humidity</li>
+</ul></li>
+<li>qualitative (categorical) variables, below columns are all qualitative variables:
+<ul>
+<li>Direction of maximum wind Gust</li>
+<li>9am wind direction</li>
+<li>3pm wind direction</li>
+</ul></li>
+</ul>
+</div>
+<div id="readimport-data" class="section level2">
+<h2>Read/Import Data</h2>
+<p>I read and imported the data into R as a data frame, I have saved and named it as “fallsCreekJulyWeather”. I used the readr package to do so. The first 5 rows of the file is plain text info, which is irrelevant and shouldn’t be read in. Row 6 is the column header, in R, reading in <span class="math inline">\(^{\circ}\)</span>C scrambled the “Min Temp” and “Max Temp” header, so I decided to skip that row as well, and simply specified the header of the table in the col_names arguments.</p>
+<p>There are no data in some of the columns such as Evaporation (mm), Sunshine (hours), 9am cloud amount (oktas) etc. I skipped those columns by specifying “-” in the col_types arguments. I specified the following attributes in the col_types arguments to read in all the fields properly:</p>
+<ul>
+<li>“f” for qualitative variables
+<ul>
+<li>Direction of maximum wind Gust</li>
+<li>9am wind direction</li>
+<li>3pm wind direction</li>
+</ul></li>
+<li>“i” for the following numeric variables which are integer
+<ul>
+<li>Speed of maximum wind gust (km/h)</li>
+<li>9am relative humidity</li>
+<li>3pm relative humidity</li>
+</ul></li>
+<li>“d” for the below numeric variables which are listed with decimal places
+<ul>
+<li>Min Temp</li>
+<li>Max Temp</li>
+<li>Rainfall (mm)</li>
+<li>9am Temperature</li>
+<li>3pm Temperature</li>
+</ul></li>
+<li>“c” for the below time and date information, and I would convert these to proper Date and POSIX class in next section. 9 am wind speed and 3 pm wind speed suppose to be a numeric field, however when I scanned thru the data, “Calm” can be one of the values of these fields, so I have also set these variables as character.
+<ul>
+<li>Date</li>
+<li>Time of maximum wind gust</li>
+<li>9am wind speed (km/h)</li>
+<li>3pm wind speed (km/h)</li>
+</ul></li>
+</ul>
+<p>There are only 31 rows in the dataset, I used the head function and specified 31 as the second argument to check the entire read-in outputs. Below are the associated R codes:</p>
+<pre class="r"><code># use read_csv to read-in the file IDCJDW3027.201907.csv, the first 6
+# rows are skipped.
+
+
+fallsCreekJulyWeather &lt;- read_csv(&quot;src/R/data/IDCJDW3027.201907.csv&quot;, skip = 6, col_types = &quot;-cddd--ficdi-fc-di-fc-&quot;,
+                                  col_names = c(&quot;Date&quot;, &quot;Min Temp&quot;, &quot;Max Temp&quot;, &quot;Rainfall (mm)&quot;, &quot;Direction of maximum wind Gust&quot;, &quot;Speed of maximum wind gust (km/h)&quot;, &quot;Time of maximum wind gust&quot;, &quot;9am Temperature&quot;, &quot;9am relative humidity&quot;, &quot;9am wind direction&quot;, &quot;9am wind speed (km/h)&quot;, &quot;3pm Temperature&quot;, &quot;3pm relative humidity&quot;, &quot;3pm wind direction&quot;, &quot;3pm wind speed (km/h)&quot;))
+
+# Check whether fallsCreekJulyWeather is a data frame
+
+is.data.frame(fallsCreekJulyWeather)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>#View the read-in output 
+
+head(fallsCreekJulyWeather, 31)</code></pre>
+<pre><code>## # A tibble: 31 x 15
+##    Date  `Min Temp` `Max Temp` `Rainfall (mm)` `Direction of m~ `Speed of maxim~
+##    &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;           &lt;dbl&gt; &lt;fct&gt;                       &lt;int&gt;
+##  1 1/7/~       -3.7       -0.8             1.6 NW                             24
+##  2 2/7/~       -4.2       -0.2             0   NNW                            11
+##  3 3/7/~       -3          1               0.8 SE                             24
+##  4 4/7/~       -2.3        4.3             0.2 ESE                            19
+##  5 5/7/~       -0.7        6.1             0   NNE                            28
+##  6 6/7/~        1.3        6               0   NNW                            37
+##  7 7/7/~        1.5        3.5             0   N                              61
+##  8 8/7/~        1.5        2              17.6 N                              52
+##  9 9/7/~       -2.5       -0.6             3.4 NNW                            54
+## 10 10/7~       -2.1       -0.1             8.6 NW                             43
+## # ... with 21 more rows, and 9 more variables: `Time of maximum wind
+## #   gust` &lt;chr&gt;, `9am Temperature` &lt;dbl&gt;, `9am relative humidity` &lt;int&gt;, `9am
+## #   wind direction` &lt;fct&gt;, `9am wind speed (km/h)` &lt;chr&gt;, `3pm
+## #   Temperature` &lt;dbl&gt;, `3pm relative humidity` &lt;int&gt;, `3pm wind
+## #   direction` &lt;fct&gt;, `3pm wind speed (km/h)` &lt;chr&gt;</code></pre>
+</div>
+<div id="inspect-and-understand" class="section level2">
+<h2>Inspect and Understand</h2>
+<p>Inspect the data frame and variables using R functions :</p>
+<ul>
+<li><p>I used the dim function to check the dimensions of the data frame.</p>
+<ul>
+<li>There are 30 observations [rows] and 15 variables [columns]</li>
+</ul></li>
+<li><p>I used the str and attributes function to check the attributes and structure of the data frame.</p>
+<ul>
+<li>Use the as.Date function to convert the <em>Date</em> from character <according to the read-in format> to Date.</li>
+<li>Use the paste and strptime function to convert <em>Time of maximum wind gust</em> from character <according to the read-in format> to time of the associated date in posix.</li>
+</ul></li>
+<li><p>There are 3 similar factor variables,</p>
+<ul>
+<li>Direction of maximum wind Gust</li>
+<li>9am wind direction</li>
+<li>3pm wind direction</li>
+</ul>
+<p>All of these factors, are the classification of wind direction. To classify all the directions inclusively, there should be four cardinal directions &lt;North - N, East - E, South - S, West - W&gt;, four intercardinal directions &lt;NE, SE, SW, NW&gt; and eight more divisions &lt;NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW&gt;. I have specified all these into levels and order them accordingly from clockwise direction, starting from North - N.</p></li>
+<li><p>The column names in the data frame are already renamed in the previous section. The row names are good with 1 to 31, which make the date of July self-explantory. I have no intention to alter anymore.</p></li>
+</ul>
+<p>Below are my R codes with outputs.</p>
+<pre class="r"><code># Dimension 
+
+dim(fallsCreekJulyWeather)</code></pre>
+<pre><code>## [1] 31 15</code></pre>
+<pre class="r"><code># Structure
+str(fallsCreekJulyWeather)</code></pre>
+<pre><code>## tibble [31 x 15] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ Date                             : chr [1:31] &quot;1/7/2019&quot; &quot;2/7/2019&quot; &quot;3/7/2019&quot; &quot;4/7/2019&quot; ...
+##  $ Min Temp                         : num [1:31] -3.7 -4.2 -3 -2.3 -0.7 1.3 1.5 1.5 -2.5 -2.1 ...
+##  $ Max Temp                         : num [1:31] -0.8 -0.2 1 4.3 6.1 6 3.5 2 -0.6 -0.1 ...
+##  $ Rainfall (mm)                    : num [1:31] 1.6 0 0.8 0.2 0 0 0 17.6 3.4 8.6 ...
+##  $ Direction of maximum wind Gust   : Factor w/ 11 levels &quot;NW&quot;,&quot;NNW&quot;,&quot;SE&quot;,..: 1 2 3 4 5 2 6 6 2 1 ...
+##  $ Speed of maximum wind gust (km/h): int [1:31] 24 11 24 19 28 37 61 52 54 43 ...
+##  $ Time of maximum wind gust        : chr [1:31] &quot;0:03&quot; &quot;1:43&quot; &quot;18:22&quot; &quot;20:28&quot; ...
+##  $ 9am Temperature                  : num [1:31] -3.1 -3 -1.7 1 2.6 3.4 2.2 1.7 -2.1 -0.7 ...
+##  $ 9am relative humidity            : int [1:31] 97 97 98 91 85 75 96 99 97 99 ...
+##  $ 9am wind direction               : Factor w/ 7 levels &quot;NW&quot;,&quot;NNW&quot;,&quot;WNW&quot;,..: 1 2 NA 3 4 4 2 3 5 2 ...
+##  $ 9am wind speed (km/h)            : chr [1:31] &quot;7&quot; &quot;6&quot; &quot;Calm&quot; &quot;6&quot; ...
+##  $ 3pm Temperature                  : num [1:31] -1.6 -0.7 0.1 3.3 5.6 5 2.2 0.9 -0.9 -1 ...
+##  $ 3pm relative humidity            : int [1:31] 98 98 99 88 72 73 99 99 99 99 ...
+##  $ 3pm wind direction               : Factor w/ 5 levels &quot;NNW&quot;,&quot;NNE&quot;,&quot;WNW&quot;,..: 1 NA NA 1 1 2 1 3 1 1 ...
+##  $ 3pm wind speed (km/h)            : chr [1:31] &quot;7&quot; &quot;Calm&quot; &quot;Calm&quot; &quot;4&quot; ...
+##  - attr(*, &quot;spec&quot;)=
+##   .. cols(
+##   ..   col_skip(),
+##   ..   Date = col_character(),
+##   ..   `Min Temp` = col_double(),
+##   ..   `Max Temp` = col_double(),
+##   ..   `Rainfall (mm)` = col_double(),
+##   ..   col_skip(),
+##   ..   col_skip(),
+##   ..   `Direction of maximum wind Gust` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   ..   `Speed of maximum wind gust (km/h)` = col_integer(),
+##   ..   `Time of maximum wind gust` = col_character(),
+##   ..   `9am Temperature` = col_double(),
+##   ..   `9am relative humidity` = col_integer(),
+##   ..   col_skip(),
+##   ..   `9am wind direction` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   ..   `9am wind speed (km/h)` = col_character(),
+##   ..   col_skip(),
+##   ..   `3pm Temperature` = col_double(),
+##   ..   `3pm relative humidity` = col_integer(),
+##   ..   col_skip(),
+##   ..   `3pm wind direction` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   ..   `3pm wind speed (km/h)` = col_character(),
+##   ..   col_skip()
+##   .. )</code></pre>
+<pre class="r"><code>#Attributes
+attributes(fallsCreekJulyWeather)</code></pre>
+<pre><code>## $names
+##  [1] &quot;Date&quot;                              &quot;Min Temp&quot;                         
+##  [3] &quot;Max Temp&quot;                          &quot;Rainfall (mm)&quot;                    
+##  [5] &quot;Direction of maximum wind Gust&quot;    &quot;Speed of maximum wind gust (km/h)&quot;
+##  [7] &quot;Time of maximum wind gust&quot;         &quot;9am Temperature&quot;                  
+##  [9] &quot;9am relative humidity&quot;             &quot;9am wind direction&quot;               
+## [11] &quot;9am wind speed (km/h)&quot;             &quot;3pm Temperature&quot;                  
+## [13] &quot;3pm relative humidity&quot;             &quot;3pm wind direction&quot;               
+## [15] &quot;3pm wind speed (km/h)&quot;            
+## 
+## $class
+## [1] &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot; 
+## 
+## $row.names
+##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+## [26] 26 27 28 29 30 31
+## 
+## $spec
+## cols(
+##   col_skip(),
+##   Date = col_character(),
+##   `Min Temp` = col_double(),
+##   `Max Temp` = col_double(),
+##   `Rainfall (mm)` = col_double(),
+##   col_skip(),
+##   col_skip(),
+##   `Direction of maximum wind Gust` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   `Speed of maximum wind gust (km/h)` = col_integer(),
+##   `Time of maximum wind gust` = col_character(),
+##   `9am Temperature` = col_double(),
+##   `9am relative humidity` = col_integer(),
+##   col_skip(),
+##   `9am wind direction` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   `9am wind speed (km/h)` = col_character(),
+##   col_skip(),
+##   `3pm Temperature` = col_double(),
+##   `3pm relative humidity` = col_integer(),
+##   col_skip(),
+##   `3pm wind direction` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   `3pm wind speed (km/h)` = col_character(),
+##   col_skip()
+## )</code></pre>
+<pre class="r"><code>#convert Date from character to Date type, check the class
+fallsCreekJulyWeather$Date &lt;- as.Date(fallsCreekJulyWeather$Date, &quot;%d/%m/%Y&quot;)
+class(fallsCreekJulyWeather$Date)</code></pre>
+<pre><code>## [1] &quot;Date&quot;</code></pre>
+<pre class="r"><code>#convert Time of maximum wind gust from character to time of the associated date in posix, check the class 
+fallsCreekJulyWeather$`Time of maximum wind gust` &lt;- paste(fallsCreekJulyWeather$Date, &quot; &quot;, fallsCreekJulyWeather$`Time of maximum wind gust`)
+  
+fallsCreekJulyWeather$`Time of maximum wind gust` &lt;- strptime(fallsCreekJulyWeather$`Time of maximum wind gust`, &quot;%Y-%m-%d %H:%M&quot;)
+class(fallsCreekJulyWeather$`Time of maximum wind gust`)</code></pre>
+<pre><code>## [1] &quot;POSIXlt&quot; &quot;POSIXt&quot;</code></pre>
+<pre class="r"><code># Order all the wind direction variables &lt;Direction of maximum wind Gust, 9am wind direction, 3pm wind direction&gt; and include all the possible directions: four cardinal directions &lt;North - N, East - E, South - S, West - W&gt;, four intercardinal directions &lt;NE, SE, SW, NW&gt; and eight more divisions &lt;NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW&gt;. 
+
+fallsCreekJulyWeather$`Direction of maximum wind Gust` &lt;- factor(fallsCreekJulyWeather$`Direction of maximum wind Gust`,
+                                                                 levels = c(&quot;N&quot;, &quot;NNE&quot;, &quot;NE&quot;, &quot;ENE&quot;, &quot;E&quot;, &quot;ESE&quot;, &quot;SE&quot;, &quot;SSE&quot;, &quot;S&quot;, &quot;SSW&quot;, &quot;SW&quot;, &quot;WSW&quot;, &quot;W&quot;, &quot;WNW&quot;, &quot;NW&quot;, &quot;NNW&quot;), ordered = TRUE)
+
+
+fallsCreekJulyWeather$`9am wind direction` &lt;- factor(fallsCreekJulyWeather$`9am wind direction`,
+                                                     levels = c(&quot;N&quot;, &quot;NNE&quot;, &quot;NE&quot;, &quot;ENE&quot;, &quot;E&quot;, &quot;ESE&quot;, &quot;SE&quot;, &quot;SSE&quot;, &quot;S&quot;, &quot;SSW&quot;, &quot;SW&quot;, &quot;WSW&quot;, &quot;W&quot;, &quot;WNW&quot;, &quot;NW&quot;, &quot;NNW&quot;), ordered = TRUE)
+
+fallsCreekJulyWeather$`3pm wind direction` &lt;- factor(fallsCreekJulyWeather$`3pm wind direction`,
+                                                     levels = c(&quot;N&quot;, &quot;NNE&quot;, &quot;NE&quot;, &quot;ENE&quot;, &quot;E&quot;, &quot;ESE&quot;, &quot;SE&quot;, &quot;SSE&quot;, &quot;S&quot;, &quot;SSW&quot;, &quot;SW&quot;, &quot;WSW&quot;, &quot;W&quot;, &quot;WNW&quot;, &quot;NW&quot;, &quot;NNW&quot;), ordered = TRUE)
+
+# Check the structure again after executing the above conversion and reorganising the factors
+
+str(fallsCreekJulyWeather)</code></pre>
+<pre><code>## tibble [31 x 15] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ Date                             : Date[1:31], format: &quot;2019-07-01&quot; &quot;2019-07-02&quot; ...
+##  $ Min Temp                         : num [1:31] -3.7 -4.2 -3 -2.3 -0.7 1.3 1.5 1.5 -2.5 -2.1 ...
+##  $ Max Temp                         : num [1:31] -0.8 -0.2 1 4.3 6.1 6 3.5 2 -0.6 -0.1 ...
+##  $ Rainfall (mm)                    : num [1:31] 1.6 0 0.8 0.2 0 0 0 17.6 3.4 8.6 ...
+##  $ Direction of maximum wind Gust   : Ord.factor w/ 16 levels &quot;N&quot;&lt;&quot;NNE&quot;&lt;&quot;NE&quot;&lt;..: 15 16 7 6 2 16 1 1 16 15 ...
+##  $ Speed of maximum wind gust (km/h): int [1:31] 24 11 24 19 28 37 61 52 54 43 ...
+##  $ Time of maximum wind gust        : POSIXlt[1:31], format: &quot;2019-07-01 00:03:00&quot; &quot;2019-07-02 01:43:00&quot; ...
+##  $ 9am Temperature                  : num [1:31] -3.1 -3 -1.7 1 2.6 3.4 2.2 1.7 -2.1 -0.7 ...
+##  $ 9am relative humidity            : int [1:31] 97 97 98 91 85 75 96 99 97 99 ...
+##  $ 9am wind direction               : Ord.factor w/ 16 levels &quot;N&quot;&lt;&quot;NNE&quot;&lt;&quot;NE&quot;&lt;..: 15 16 NA 14 1 1 16 14 13 16 ...
+##  $ 9am wind speed (km/h)            : chr [1:31] &quot;7&quot; &quot;6&quot; &quot;Calm&quot; &quot;6&quot; ...
+##  $ 3pm Temperature                  : num [1:31] -1.6 -0.7 0.1 3.3 5.6 5 2.2 0.9 -0.9 -1 ...
+##  $ 3pm relative humidity            : int [1:31] 98 98 99 88 72 73 99 99 99 99 ...
+##  $ 3pm wind direction               : Ord.factor w/ 16 levels &quot;N&quot;&lt;&quot;NNE&quot;&lt;&quot;NE&quot;&lt;..: 16 NA NA 16 16 2 16 14 16 16 ...
+##  $ 3pm wind speed (km/h)            : chr [1:31] &quot;7&quot; &quot;Calm&quot; &quot;Calm&quot; &quot;4&quot; ...
+##  - attr(*, &quot;spec&quot;)=
+##   .. cols(
+##   ..   col_skip(),
+##   ..   Date = col_character(),
+##   ..   `Min Temp` = col_double(),
+##   ..   `Max Temp` = col_double(),
+##   ..   `Rainfall (mm)` = col_double(),
+##   ..   col_skip(),
+##   ..   col_skip(),
+##   ..   `Direction of maximum wind Gust` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   ..   `Speed of maximum wind gust (km/h)` = col_integer(),
+##   ..   `Time of maximum wind gust` = col_character(),
+##   ..   `9am Temperature` = col_double(),
+##   ..   `9am relative humidity` = col_integer(),
+##   ..   col_skip(),
+##   ..   `9am wind direction` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   ..   `9am wind speed (km/h)` = col_character(),
+##   ..   col_skip(),
+##   ..   `3pm Temperature` = col_double(),
+##   ..   `3pm relative humidity` = col_integer(),
+##   ..   col_skip(),
+##   ..   `3pm wind direction` = col_factor(levels = NULL, ordered = FALSE, include_na = FALSE),
+##   ..   `3pm wind speed (km/h)` = col_character(),
+##   ..   col_skip()
+##   .. )</code></pre>
+</div>
+<div id="subsetting-i" class="section level2">
+<h2>Subsetting I</h2>
+<p>Subset the data frame using first 10 observations (include all variables). Then convert it to a matrix.</p>
+<p>I checked the structure of the matrix, as matrix is homogeneous, everything has been converted to character.</p>
+<p>Character is the data type with highest order in coercion, all the other data types have been coerced into Character in my matrix.</p>
+<pre class="r"><code># Subset the data set and convert it to a matrix 
+
+subFallsCreekJulyWeather &lt;- fallsCreekJulyWeather[1:10,] 
+
+
+# Viewing the subset and the first 10 rows with all the variables are listed.
+head(subFallsCreekJulyWeather, 10)</code></pre>
+<pre><code>## # A tibble: 10 x 15
+##    Date       `Min Temp` `Max Temp` `Rainfall (mm)` `Direction of m~
+##    &lt;date&gt;          &lt;dbl&gt;      &lt;dbl&gt;           &lt;dbl&gt; &lt;ord&gt;           
+##  1 2019-07-01       -3.7       -0.8             1.6 NW              
+##  2 2019-07-02       -4.2       -0.2             0   NNW             
+##  3 2019-07-03       -3          1               0.8 SE              
+##  4 2019-07-04       -2.3        4.3             0.2 ESE             
+##  5 2019-07-05       -0.7        6.1             0   NNE             
+##  6 2019-07-06        1.3        6               0   NNW             
+##  7 2019-07-07        1.5        3.5             0   N               
+##  8 2019-07-08        1.5        2              17.6 N               
+##  9 2019-07-09       -2.5       -0.6             3.4 NNW             
+## 10 2019-07-10       -2.1       -0.1             8.6 NW              
+## # ... with 10 more variables: `Speed of maximum wind gust (km/h)` &lt;int&gt;, `Time
+## #   of maximum wind gust` &lt;dttm&gt;, `9am Temperature` &lt;dbl&gt;, `9am relative
+## #   humidity` &lt;int&gt;, `9am wind direction` &lt;ord&gt;, `9am wind speed (km/h)` &lt;chr&gt;,
+## #   `3pm Temperature` &lt;dbl&gt;, `3pm relative humidity` &lt;int&gt;, `3pm wind
+## #   direction` &lt;ord&gt;, `3pm wind speed (km/h)` &lt;chr&gt;</code></pre>
+<pre class="r"><code># Checking the structure of the subset, it&#39;s the same as whole data set. 
+str(subFallsCreekJulyWeather)</code></pre>
+<pre><code>## tibble [10 x 15] (S3: tbl_df/tbl/data.frame)
+##  $ Date                             : Date[1:10], format: &quot;2019-07-01&quot; &quot;2019-07-02&quot; ...
+##  $ Min Temp                         : num [1:10] -3.7 -4.2 -3 -2.3 -0.7 1.3 1.5 1.5 -2.5 -2.1
+##  $ Max Temp                         : num [1:10] -0.8 -0.2 1 4.3 6.1 6 3.5 2 -0.6 -0.1
+##  $ Rainfall (mm)                    : num [1:10] 1.6 0 0.8 0.2 0 0 0 17.6 3.4 8.6
+##  $ Direction of maximum wind Gust   : Ord.factor w/ 16 levels &quot;N&quot;&lt;&quot;NNE&quot;&lt;&quot;NE&quot;&lt;..: 15 16 7 6 2 16 1 1 16 15
+##  $ Speed of maximum wind gust (km/h): int [1:10] 24 11 24 19 28 37 61 52 54 43
+##  $ Time of maximum wind gust        : POSIXlt[1:10], format: &quot;2019-07-01 00:03:00&quot; &quot;2019-07-02 01:43:00&quot; ...
+##  $ 9am Temperature                  : num [1:10] -3.1 -3 -1.7 1 2.6 3.4 2.2 1.7 -2.1 -0.7
+##  $ 9am relative humidity            : int [1:10] 97 97 98 91 85 75 96 99 97 99
+##  $ 9am wind direction               : Ord.factor w/ 16 levels &quot;N&quot;&lt;&quot;NNE&quot;&lt;&quot;NE&quot;&lt;..: 15 16 NA 14 1 1 16 14 13 16
+##  $ 9am wind speed (km/h)            : chr [1:10] &quot;7&quot; &quot;6&quot; &quot;Calm&quot; &quot;6&quot; ...
+##  $ 3pm Temperature                  : num [1:10] -1.6 -0.7 0.1 3.3 5.6 5 2.2 0.9 -0.9 -1
+##  $ 3pm relative humidity            : int [1:10] 98 98 99 88 72 73 99 99 99 99
+##  $ 3pm wind direction               : Ord.factor w/ 16 levels &quot;N&quot;&lt;&quot;NNE&quot;&lt;&quot;NE&quot;&lt;..: 16 NA NA 16 16 2 16 14 16 16
+##  $ 3pm wind speed (km/h)            : chr [1:10] &quot;7&quot; &quot;Calm&quot; &quot;Calm&quot; &quot;4&quot; ...</code></pre>
+<pre class="r"><code># Checking the class of the subset, it&#39;s still a data frame
+class(subFallsCreekJulyWeather)</code></pre>
+<pre><code>## [1] &quot;tbl_df&quot;     &quot;tbl&quot;        &quot;data.frame&quot;</code></pre>
+<pre class="r"><code># convert the subset from data frame to Matrix
+subFallsCreekJulyWeather &lt;- as.matrix(subFallsCreekJulyWeather)
+
+# Check the class, now the subset is a matrix
+class(subFallsCreekJulyWeather)</code></pre>
+<pre><code>## [1] &quot;matrix&quot; &quot;array&quot;</code></pre>
+<pre class="r"><code># Check the structure of the matrix, it is character
+str(subFallsCreekJulyWeather)</code></pre>
+<pre><code>##  chr [1:10, 1:15] &quot;2019-07-01&quot; &quot;2019-07-02&quot; &quot;2019-07-03&quot; &quot;2019-07-04&quot; ...
+##  - attr(*, &quot;dimnames&quot;)=List of 2
+##   ..$ : NULL
+##   ..$ : chr [1:15] &quot;Date&quot; &quot;Min Temp&quot; &quot;Max Temp&quot; &quot;Rainfall (mm)&quot; ...</code></pre>
+</div>
+<div id="subsetting-ii" class="section level2">
+<h2>Subsetting II</h2>
+<p>Subset the data frame including only first and the last variable in the data set, save it as an R object file (.RData). Below is the relevant R codes with explanations and outputs:</p>
+<pre class="r"><code># Subset the dataset to include only the first and last variable  
+subFallsCreekJulyWeather1and15 &lt;- fallsCreekJulyWeather[,c(1,15)] 
+
+# View this new subset, there are only 2 variables &lt;columns&gt; and 31 observations &lt;rows&gt; 
+head(subFallsCreekJulyWeather1and15, 31)</code></pre>
+<pre><code>## # A tibble: 31 x 2
+##    Date       `3pm wind speed (km/h)`
+##    &lt;date&gt;     &lt;chr&gt;                  
+##  1 2019-07-01 7                      
+##  2 2019-07-02 Calm                   
+##  3 2019-07-03 Calm                   
+##  4 2019-07-04 4                      
+##  5 2019-07-05 9                      
+##  6 2019-07-06 7                      
+##  7 2019-07-07 19                     
+##  8 2019-07-08 15                     
+##  9 2019-07-09 24                     
+## 10 2019-07-10 26                     
+## # ... with 21 more rows</code></pre>
+<pre class="r"><code># Check the structure of this subset, it is still a data frame with the same data type as the whole original data set.
+str(subFallsCreekJulyWeather1and15)</code></pre>
+<pre><code>## tibble [31 x 2] (S3: tbl_df/tbl/data.frame)
+##  $ Date                 : Date[1:31], format: &quot;2019-07-01&quot; &quot;2019-07-02&quot; ...
+##  $ 3pm wind speed (km/h): chr [1:31] &quot;7&quot; &quot;Calm&quot; &quot;Calm&quot; &quot;4&quot; ...</code></pre>
+<pre class="r"><code>is.data.frame(subFallsCreekJulyWeather1and15)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code># Save this subset into a R object file
+save(subFallsCreekJulyWeather1and15, file=&quot;output/R/2_Weather_1and15.Rdata&quot;)</code></pre>
+</div>
+<div id="create-a-new-data-frame" class="section level2">
+<h2>Create a new Data Frame</h2>
+<p>Create a data frame with 2 variables and 4 observations. The data frame contains one integer variable <em>intVar</em> and one ordinal variable <em>ordVar</em>.</p>
+<p><em>ordVar</em> has been factored with proper order. I have checked the structure of my variables and the levels of the ordinal variable as below. After that I have created a numeric vector, <em>Avg_waiting_time</em> and use cbind() to add it to my data frame.</p>
+<p>I then checked the attributes and the dimension of your new data frame. Below is the relevant R codes with explanations and outputs:</p>
+<pre class="r"><code># A new data frame with 2 variables and 4 observations. It contains one integer variable and one ordinal variable.
+
+# Integer Variable with 4 observations
+intVar &lt;- c(1L, 2L, 3L, 4L)
+
+# Ordinal Variable with 4 observations.  It has been ordered properly 
+ordVar &lt;- c(&quot;slow&quot;, &quot;fast&quot;, &quot;normal&quot;, &quot;express&quot;)
+ordVar &lt;- factor(ordVar, levels=c(&quot;slow&quot;,&quot;normal&quot;, &quot;fast&quot;, &quot;express&quot;), ordered=TRUE)
+
+# Print these 2 variables 
+intVar</code></pre>
+<pre><code>## [1] 1 2 3 4</code></pre>
+<pre class="r"><code>ordVar</code></pre>
+<pre><code>## [1] slow    fast    normal  express
+## Levels: slow &lt; normal &lt; fast &lt; express</code></pre>
+<pre class="r"><code># Combine these 2 variables into a data frame
+df_q6 &lt;- data.frame(col1=intVar, col2=ordVar)
+
+# Assign these 2 variables with proper names and print the data frame
+colnames(df_q6) &lt;- c(&quot;Queue No&quot;, &quot;Speed&quot;)
+df_q6</code></pre>
+<pre><code>##   Queue No   Speed
+## 1        1    slow
+## 2        2    fast
+## 3        3  normal
+## 4        4 express</code></pre>
+<pre class="r"><code># Check the structure of the data frame
+str(df_q6)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    4 obs. of  2 variables:
+##  $ Queue No: int  1 2 3 4
+##  $ Speed   : Ord.factor w/ 4 levels &quot;slow&quot;&lt;&quot;normal&quot;&lt;..: 1 3 2 4</code></pre>
+<pre class="r"><code># Create a numeric vector 
+Avg_waiting_time &lt;- c(8.8, 3.6, 6.3, 2.1)
+
+# Check the class of the numeric vector
+class(Avg_waiting_time)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code># Use cbind to add onto the dataframe
+df_q6 &lt;- cbind(df_q6, Avg_waiting_time)
+
+# Check the attributes of the new dataframe, it shows the column and row name.  The class of df_q6 is stil a data frame.
+attributes(df_q6)</code></pre>
+<pre><code>## $names
+## [1] &quot;Queue No&quot;         &quot;Speed&quot;            &quot;Avg_waiting_time&quot;
+## 
+## $class
+## [1] &quot;data.frame&quot;
+## 
+## $row.names
+## [1] 1 2 3 4</code></pre>
+<pre class="r"><code># Check the structure of the new dataframe, there are now 3 variables, Queue No is integer, Speed is an ordered factor, Avg_waiting_time is numeric
+str(df_q6)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    4 obs. of  3 variables:
+##  $ Queue No        : int  1 2 3 4
+##  $ Speed           : Ord.factor w/ 4 levels &quot;slow&quot;&lt;&quot;normal&quot;&lt;..: 1 3 2 4
+##  $ Avg_waiting_time: num  8.8 3.6 6.3 2.1</code></pre>
+<pre class="r"><code># Check the dimension of the new dataframe, it&#39;s now 4 observations &lt;rows&gt; with 3 variables &lt;columns&gt;
+dim(df_q6)</code></pre>
+<pre><code>## [1] 4 3</code></pre>
+<pre class="r"><code># Finally print out the new dataframe
+df_q6</code></pre>
+<pre><code>##   Queue No   Speed Avg_waiting_time
+## 1        1    slow              8.8
+## 2        2    fast              3.6
+## 3        3  normal              6.3
+## 4        4 express              2.1</code></pre>
+<p><br> <br></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
