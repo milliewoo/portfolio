@@ -374,24 +374,34 @@ div.tocify {
     <li class="divider"></li>
     <li class="dropdown-header">Statistic</li>
     <li>
-      <a href="R_1_Normal.html">Normal Distribution</a>
+      <a href="R_1_Normal.html">Body Measurements</a>
     </li>
     <li>
-      <a href="R_1_T-test.html">Paired T-test</a>
+      <a href="R_1_T-test.html">Supermarket Price Wars</a>
     </li>
     <li>
-      <a href="R_1_Regression.html">Regression</a>
+      <a href="R_1_Regression.html">Bike Rental Investigation</a>
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Data Wrangling</li>
     <li>
-      <a href="R_2_Weather.html">Exploring Data Structure</a>
+      <a href="R_2_Weather.html">Weather Records</a>
     </li>
     <li>
-      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+      <a href="R_2_WHO.html">WHO, Species and Surveys</a>
     </li>
     <li>
-      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+      <a href="R_2_F1.html">Formula One Racing</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Time Series Analysis</li>
+    <li>
+      <a href="R_3_TimeSeriesReport.html">Reports</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Applied Bayesian Statistics</li>
+    <li>
+      <a href="R_4_BayesianReport.html">Reports</a>
     </li>
   </ul>
 </li>
@@ -484,10 +494,10 @@ div.tocify {
 </div>
 
 
-<div id="task-1-reshpae-and-transform" class="section level2">
-<h2>Task 1: Reshpae and Transform</h2>
-<div id="read-who-dataset" class="section level3">
-<h3>Read WHO dataset</h3>
+<div id="task-1-reshpae-and-transform" class="section level1">
+<h1>Task 1: Reshpae and Transform</h1>
+<div id="read-who-dataset" class="section level2">
+<h2>Read WHO dataset</h2>
 <pre class="r"><code># This is an R chunk for reading the WHO data and check the dimension of the original dataset. R codes as below:
 
 WHO &lt;- read.csv(&quot;src/R/data/WHO.csv&quot;, stringsAsFactors = FALSE)
@@ -517,8 +527,8 @@ dim(WHO)</code></pre>
 </ul>
 </div>
 </div>
-<div id="task-2-separate" class="section level2">
-<h2>Task 2: Separate</h2>
+<div id="task-2-separate" class="section level1">
+<h1>Task 2: Separate</h1>
 <pre class="r"><code># R chunk for Task 2:
 
 #separate the multi-variable code into &quot;new&quot;, &quot;car&quot;, &quot;sexage&quot; as these can be splitted by the separator character &quot;_&quot; 
@@ -544,8 +554,8 @@ dim(WHO)</code></pre>
 <li>dim() function shows that WHO dataframe is transformed to 405440 observations [same as task 1] and 9 variables (“code” –&gt; “new”, “var”, “sex” and “age”, i.e. 6+4-1=9)</li>
 </ul>
 </div>
-<div id="task-3-transform" class="section level2">
-<h2>Task 3: Transform</h2>
+<div id="task-3-transform" class="section level1">
+<h1>Task 3: Transform</h1>
 <pre class="r"><code># R chunk for Task 3: 
 
 #transform the var column from long format to wide format, there are 4 distinct values (“rel”, “ep”, “sn”, and “sp”) in the var column 
@@ -567,8 +577,8 @@ dim(WHO)</code></pre>
 <li>dim() function shows that WHO dataframe is transformed to 101360 observations (there were 405440 rows in task 2, since 4 distinct values in the var column, 405440/4 = 101360, which shows the transformed row count is correct in this step) and 11 variables (9 variables in task 2, since there are 4 distinct values in var column, var –&gt; rel, ep, sn, and sp, should give us 3 more additional columns, but the information in column <strong>value</strong> in task 2 is now disseminated into the cells under rel, ep, sn, and sp, which give us only 2 more additional columns, thus 9 variables from task 2 –&gt; 11 variables in task 3).</li>
 </ul>
 </div>
-<div id="task-4-mutate" class="section level2">
-<h2>Task 4: Mutate</h2>
+<div id="task-4-mutate" class="section level1">
+<h1>Task 4: Mutate</h1>
 <pre class="r"><code># R chunk for Task 4: 
 #Use mutate to factorize age and sex in one statement
 WHO &lt;- WHO %&gt;% mutate(sex=factor(sex, levels=c(&quot;m&quot;,&quot;f&quot;)),age=factor(age, levels=c(&quot;014&quot;,&quot;1524&quot;,&quot;2534&quot;, &quot;3544&quot;, &quot;4554&quot;, &quot;5564&quot;, &quot;65&quot;), labels = c(&quot;&lt;15&quot;, &quot;15-24&quot;, &quot;25-34&quot;, &quot;35-44&quot;, &quot;45-54&quot;, &quot;55-64&quot;,&quot;65&gt;=&quot;), ordered = TRUE))
@@ -603,8 +613,8 @@ dim(WHO)</code></pre>
 <li>dim() function shows that WHO dataframe is transformed to 101360 observations and 11 variables (which is same as task 3, factorize column would not result in any dimensional change)</li>
 </ul>
 </div>
-<div id="task-5-filter-select" class="section level2">
-<h2>Task 5: Filter &amp; Select</h2>
+<div id="task-5-filter-select" class="section level1">
+<h1>Task 5: Filter &amp; Select</h1>
 <pre class="r"><code># R chunk for Task 5: 
 
 WHO_subset &lt;- select(WHO, -c(iso2,new))
@@ -638,10 +648,10 @@ dim(WHO_subset)</code></pre>
 <li>dim() function shows that WHO_subset dataframe has 1428 observations and 9 variables (i.e. there are 1428 rows for country, India, Japan and Sri Lanka, and the subset is 2 variables less compare to WHO dataframe in task 4 after taking away the redundant columns <code>iso2</code> and <code>new</code>)</li>
 </ul>
 </div>
-<div id="task-6-join" class="section level2">
-<h2>Task 6: Join</h2>
-<div id="read-species-and-surveys-data-sets" class="section level3">
-<h3>Read Species and Surveys data sets</h3>
+<div id="task-6-join" class="section level1">
+<h1>Task 6: Join</h1>
+<div id="read-species-and-surveys-data-sets" class="section level2">
+<h2>Read Species and Surveys data sets</h2>
 <pre class="r"><code># R chunk for reading the Species and Surveys data sets. R codes as below:
 
 species &lt;- read.csv(&quot;src/R/data/species.csv&quot;, stringsAsFactors = FALSE)
@@ -677,18 +687,18 @@ dim(surveys_combined)</code></pre>
 </ul>
 </div>
 </div>
-<div id="task-7-calculate" class="section level2">
-<h2>Task 7: Calculate</h2>
-<div id="step-1" class="section level3">
-<h3>Step 1</h3>
+<div id="task-7-calculate" class="section level1">
+<h1>Task 7: Calculate</h1>
+<div id="step-1" class="section level2">
+<h2>Step 1</h2>
 <p>Use the filter() function to find observations where species_id=“PE”, then use the summarise() function to construct average weight and average hindfoot length statistics grouped by month. na.rm=TRUE is specified in the mean function as the second argument to exclude missing values while calculating average. Save this into <code>PE_avg_by_month</code></p>
 <pre class="r"><code># R chunk for Task 7. R codes as below: 
 
 PE_avg_by_month &lt;- surveys_combined %&gt;% filter(species_id == &quot;PE&quot;) %&gt;% group_by(month) %&gt;%
   summarise( avg_weight = mean(weight, na.rm = TRUE), avg_hindfoot_legth = mean(hindfoot_length, na.rm= TRUE) )</code></pre>
 </div>
-<div id="step-2" class="section level3">
-<h3>Step 2</h3>
+<div id="step-2" class="section level2">
+<h2>Step 2</h2>
 <p>Print out <code>PE_avg_by_month</code></p>
 <pre class="r"><code>PE_avg_by_month</code></pre>
 <pre><code>## # A tibble: 12 x 3
@@ -708,10 +718,10 @@ PE_avg_by_month &lt;- surveys_combined %&gt;% filter(species_id == &quot;PE&quot
 ## 12    12       21.3               20.4</code></pre>
 </div>
 </div>
-<div id="task-8-missing-values" class="section level2">
-<h2>Task 8: Missing Values</h2>
-<div id="step-1-1" class="section level3">
-<h3>Step 1</h3>
+<div id="task-8-missing-values" class="section level1">
+<h1>Task 8: Missing Values</h1>
+<div id="step-1-1" class="section level2">
+<h2>Step 1</h2>
 <p>Use filter() function to find observations from surveys_combined data frame where year is 1997, rename this data set as “surveys_combined_year”, print the first 6 rows of the filtered dataset.</p>
 <pre class="r"><code># R chunk for Task 8. R codes as below: 
 
@@ -732,8 +742,8 @@ head(surveys_combined_year)</code></pre>
 ## 5 merriami Rodent
 ## 6 merriami Rodent</code></pre>
 </div>
-<div id="step-2-1" class="section level3">
-<h3>Step 2</h3>
+<div id="step-2-1" class="section level2">
+<h2>Step 2</h2>
 <p>Use sum(is.na(weight)) to find the total missing values in the ‘weight’ column and it is grouped by species_id, save this into <code>isNaSO</code>, print the first 6 rows of this variable</p>
 <pre class="r"><code>isNaSO &lt;- surveys_combined_year %&gt;% group_by(species_id) %&gt;%
   summarise( Missing_weight= sum(is.na(weight)))
@@ -749,8 +759,8 @@ head(isNaSO)</code></pre>
 ## 5 &quot;DO&quot;                    0
 ## 6 &quot;DS&quot;                    0</code></pre>
 </div>
-<div id="step-3" class="section level3">
-<h3>Step 3</h3>
+<div id="step-3" class="section level2">
+<h2>Step 3</h2>
 <p>simply calculate the average weight of the surveys_combined_year dataset grouped by species_id, save this into the <code>SOmean</code>, print the first 6 rows of this variable</p>
 <pre class="r"><code>SOmean &lt;- surveys_combined_year %&gt;% group_by(species_id) %&gt;%
   summarise(ave_weight=mean(weight,na.rm=TRUE))
@@ -766,17 +776,17 @@ head(SOmean)</code></pre>
 ## 5 &quot;DO&quot;             48.2
 ## 6 &quot;DS&quot;            111</code></pre>
 </div>
-<div id="step-4" class="section level3">
-<h3>Step 4</h3>
+<div id="step-4" class="section level2">
+<h2>Step 4</h2>
 <p>Use the below R code to replace the missing values in the “weight” column with the mean values of each species, if the value is not missing, just simply retain the original values. Save this imputed data as <code>surveys_weight_imputed</code>.</p>
 <pre class="r"><code>surveys_weight_imputed &lt;- surveys_combined_year %&gt;% group_by(species_id) %&gt;%
   mutate(weight=ifelse(is.na(weight),mean(weight,na.rm=TRUE),weight))</code></pre>
 </div>
-<div id="checking" class="section level3">
-<h3>Checking</h3>
+<div id="checking" class="section level2">
+<h2>Checking</h2>
 <p><strong>To check whether the imputation was successful, we must run the following codes</strong></p>
-<div id="step-c1" class="section level4">
-<h4>Step c1</h4>
+<div id="step-c1" class="section level3">
+<h3>Step c1</h3>
 <p>Use sum(is.na(weight)) again to find the total missing values in the ‘weight’ column and grouped by species_id, save this into <code>isNaSI</code>. If the imputation is succesful, all the species_id which avg_weight is not NAN should have a sum(is.na(weight)) = 0 in <code>isNASI</code>. We could compare the first 10 rows of <code>isNaSI</code> with <code>isNaSO</code> (generated in step 2) and <code>SOmean</code> (generated in step3) side by side as below.</p>
 <pre class="r"><code>isNaSI &lt;- surveys_weight_imputed %&gt;% group_by(species_id) %&gt;%
   summarise( Missing_weight= sum(is.na(weight)))
@@ -1025,8 +1035,8 @@ PB
 </tbody>
 </table>
 </div>
-<div id="step-c2" class="section level4">
-<h4>step c2</h4>
+<div id="step-c2" class="section level3">
+<h3>step c2</h3>
 <p>Pick 2 species_id (e.g. DM and OT) which has missing values but the average weight is not NaN. Check whether we preserve the same value for the non-missing original data. Cross check the first 6 rows of the before and after imputed datasets.</p>
 <pre class="r"><code>#Filter the surveys_combined_year dataset with species_id=&quot;DM&quot; and only select the species_id and weight column, save this into `DM` 
 DM &lt;- surveys_combined_year %&gt;% filter(species_id == &quot;DM&quot;) %&gt;% select(&quot;species_id&quot;, &quot;weight&quot;)
@@ -1257,8 +1267,8 @@ OT
 </tbody>
 </table>
 </div>
-<div id="step-c3" class="section level4">
-<h4>step c3</h4>
+<div id="step-c3" class="section level3">
+<h3>step c3</h3>
 <p>Check the imputed weight values are with the correct mean average weight for the species_id “DM” and “OT”</p>
 <pre class="r"><code># Use built-in function kable in knitr package to tidy up `DM` and `DM_after` with all the imputed rows into a single table, so we can compare side-by-side.
 kable(cbind(DM[which(is.na(DM$weight)),],DM_after[which(is.na(DM$weight)),]))%&gt;% add_header_above(c(&quot;DM&quot; = 2, &quot;DM_after&quot; = 2)) %&gt;% kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))  </code></pre>
@@ -1402,10 +1412,10 @@ OT
 </div>
 </div>
 </div>
-<div id="task-9-special-values" class="section level2">
-<h2>Task 9: Special Values</h2>
-<div id="step-1-2" class="section level3">
-<h3>Step 1</h3>
+<div id="task-9-special-values" class="section level1">
+<h1>Task 9: Special Values</h1>
+<div id="step-1-2" class="section level2">
+<h2>Step 1</h2>
 <p>Create a function which would return true if the inspected value is infinite or NaN</p>
 <pre class="r"><code># R chunk for Task 9. R codes as below:
 #
@@ -1413,8 +1423,8 @@ is.special &lt;- function(x){
   if (is.numeric(x)) (is.infinite(x) | is.nan(x))
 }</code></pre>
 </div>
-<div id="step-2-2" class="section level3">
-<h3>Step 2</h3>
+<div id="step-2-2" class="section level2">
+<h2>Step 2</h2>
 <p>Use sum(is.special(weight)) to find the total speical values (i.e. either infinite or NaN ) in the ‘weight’ column grouped by species_id in surveys_weight_imputed dataset, save this into <code>isSpecialSI</code>, print the row count of special value and total row count of the species which has special values in the weight column.</p>
 <pre class="r"><code>isSpecialSI &lt;-surveys_weight_imputed %&gt;% group_by(species_id) %&gt;%
   summarise( special_cnt= sum(is.special(weight)), total_row_cnt = n())
@@ -1430,8 +1440,8 @@ isSpecialSI[isSpecialSI$special_cnt!=0,]</code></pre>
 ## 5 &quot;SS&quot;                12            12</code></pre>
 <p><strong>Finding</strong> - 5 species_id (namely: “AH”, “CB”, “SA”, “SS” and missing species_id value, we would call these 5 species_id from now on) have special values in the weight column, and all the rows of these species_id are with special values.</p>
 </div>
-<div id="step-3-1" class="section level3">
-<h3>Step 3</h3>
+<div id="step-3-1" class="section level2">
+<h2>Step 3</h2>
 <p>Compare the isSpecialSI list with the SOmean list side-by-side (recall, we calculated the average weight of the surveys_combined_year dataset grouped by species_id and saved into <code>SOmean</code>), we found that all the average wieght for these species has been computed as NAN</p>
 <pre class="r"><code>kable(cbind(isSpecialSI[isSpecialSI$special_cnt!=0,], SOmean[is.nan(SOmean$ave_weight),])) %&gt;% add_header_above(c(&quot;isSpecialSI&quot; = 3, &quot;SOmean&quot; = 2)) %&gt;% kable_styling(latex_options = c(&quot;striped&quot;, &quot;scale_down&quot;))</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -1553,8 +1563,8 @@ NaN
 </tbody>
 </table>
 </div>
-<div id="step-4-1" class="section level3">
-<h3>Step 4</h3>
+<div id="step-4-1" class="section level2">
+<h2>Step 4</h2>
 <p>Look back into the surveys_combined_year dataset, we found that before imputation, <strong>all</strong> the weight values for these 5 species_id are missing. That’s the reason why we couldn’t compute the average weight for these 5 species_id, and all turned out to be <strong>NaN</strong>. We could validate this by: + Calculate the row counts in the surveys_combined_year of those 5 species_id + Calculate the row counts of special values we found from the weight column of <code>surveys_weight_imputed</code><br />
 + If the above row counts match, then we prove number of rows having special weight values in <code>surveys_weight_imputed</code> would be equal to the number of rows in <code>surveys_combined_year</code> for those 5 species_id.</p>
 <pre class="r"><code>#Calculate the row counts in the surveys_combined_year of those 5 species_id,  &quot;AH&quot;, &quot;CB&quot;, &quot;SA&quot;, &quot;SS&quot; and missing species_id value
@@ -1567,17 +1577,17 @@ sum(is.special(surveys_weight_imputed$weight))</code></pre>
 <pre><code>## [1] 54</code></pre>
 </div>
 </div>
-<div id="task-10-outliers" class="section level2">
-<h2>Task 10: Outliers</h2>
-<div id="step-1-3" class="section level3">
-<h3>Step 1</h3>
+<div id="task-10-outliers" class="section level1">
+<h1>Task 10: Outliers</h1>
+<div id="step-1-3" class="section level2">
+<h2>Step 1</h2>
 <p>Check if there is any missing values in the field hindfoot_length</p>
 <pre class="r"><code># R chunk for Task 10. R codes as below:
 sum(is.na(surveys_combined$hindfoot_length))</code></pre>
 <pre><code>## [1] 4111</code></pre>
 </div>
-<div id="step-2-3" class="section level3">
-<h3>Step 2</h3>
+<div id="step-2-3" class="section level2">
+<h2>Step 2</h2>
 <p>As the missing value percentage is high (4111 missing out of 35549 records, &gt; 5%), impute the missing hindfoot_length by year. Check whether the average of the first 5 groups have been imputed correctly. Export the original and imputed dataframes to csv files for further checking.</p>
 <pre class="r"><code>isNaSO &lt;- surveys_combined %&gt;% group_by(year) %&gt;%
   summarise( Missing_length = sum(is.na(hindfoot_length)))
@@ -1704,8 +1714,8 @@ ave_length
 </tbody>
 </table>
 </div>
-<div id="step-3-2" class="section level3">
-<h3>Step 3</h3>
+<div id="step-3-2" class="section level2">
+<h2>Step 3</h2>
 <p>use boxplot to inspect the outliner of hindfoot_length in the <code>surveys_length_imputed</code> dataset, print the outliers’ values</p>
 <pre class="r"><code>hindfoot_box &lt;- boxplot(surveys_length_imputed$hindfoot_length)</code></pre>
 <p><img src="R_2_WHO_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -1713,8 +1723,8 @@ ave_length
 <pre><code>## [1] 70 64</code></pre>
 <p><strong>Methodology to handle outliers</strong> The outliers values, 64 and 70 do not seem to be data entry or data processing error, as it’s not far off from the upper outlier fences. We shouldn’t delete/exclude these outliers or imputing with the mean values. We should use capping to replace the outliers with the maximum and minimum values within the non-outliers range. Those observations outside the lower outlier fences will be replaced with the value of 5th percentile and those that lie above upper outlier fences will be replaced with the value of 95th percentile according to the notes in module 6.</p>
 </div>
-<div id="step-4-2" class="section level3">
-<h3>step 4</h3>
+<div id="step-4-2" class="section level2">
+<h2>step 4</h2>
 <p>create the cap function to return the 5% and 95% quantile of the calling dataset, use it to find the 5% and 95% quantile of the hindfoot_length in the surveys_combined dataset, save this as “lower” and “upper” value in bound variable, print and show these values</p>
 <pre class="r"><code>cap &lt;- function(x){
   quantiles &lt;- quantile( x, c(.05, 0.25, 0.75, .95 ), na.rm = TRUE)
@@ -1734,8 +1744,8 @@ bound[&quot;Lower&quot;]</code></pre>
 <pre><code>## Upper 
 ##    48</code></pre>
 </div>
-<div id="step-5" class="section level3">
-<h3>Step 5</h3>
+<div id="step-5" class="section level2">
+<h2>Step 5</h2>
 <p>find the outlier row in the surveys_combined data set, print the hindfoot_length value of these rows</p>
 <pre class="r"><code>outlier_row &lt;- which((surveys_length_imputed$hindfoot_length) %in% hindfoot_box$out)
 outlier_row</code></pre>
@@ -1743,14 +1753,14 @@ outlier_row</code></pre>
 <pre class="r"><code>surveys_length_imputed[outlier_row,]$hindfoot_length </code></pre>
 <pre><code>## [1] 70 64</code></pre>
 </div>
-<div id="step-6" class="section level3">
-<h3>Step 6</h3>
+<div id="step-6" class="section level2">
+<h2>Step 6</h2>
 <p>Replace the outliners with the capped values computed in step 2, if the outliner is below the lower bound value, replace it with the lower bound value, otherwise replace with upper bound value</p>
 <pre class="r"><code>surveys_length_imputed[outlier_row,]$hindfoot_length &lt;-
 ifelse(surveys_length_imputed[outlier_row,]$hindfoot_length &lt; bound[&quot;Lower&quot;] ,bound[&quot;Lower&quot;],bound[&quot;Upper&quot;])</code></pre>
 </div>
-<div id="step-7" class="section level3">
-<h3>step 7</h3>
+<div id="step-7" class="section level2">
+<h2>step 7</h2>
 <p>Draw the boxplot diagram again, there shouldn’t be any outliner</p>
 <pre class="r"><code>boxplot(surveys_length_imputed$hindfoot_length)</code></pre>
 <p><img src="R_2_WHO_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>

@@ -372,24 +372,34 @@ div.tocify {
     <li class="divider"></li>
     <li class="dropdown-header">Statistic</li>
     <li>
-      <a href="R_1_Normal.html">Normal Distribution</a>
+      <a href="R_1_Normal.html">Body Measurements</a>
     </li>
     <li>
-      <a href="R_1_T-test.html">Paired T-test</a>
+      <a href="R_1_T-test.html">Supermarket Price Wars</a>
     </li>
     <li>
-      <a href="R_1_Regression.html">Regression</a>
+      <a href="R_1_Regression.html">Bike Rental Investigation</a>
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Data Wrangling</li>
     <li>
-      <a href="R_2_Weather.html">Exploring Data Structure</a>
+      <a href="R_2_Weather.html">Weather Records</a>
     </li>
     <li>
-      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+      <a href="R_2_WHO.html">WHO, Species and Surveys</a>
     </li>
     <li>
-      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+      <a href="R_2_F1.html">Formula One Racing</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Time Series Analysis</li>
+    <li>
+      <a href="R_3_TimeSeriesReport.html">Reports</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Applied Bayesian Statistics</li>
+    <li>
+      <a href="R_4_BayesianReport.html">Reports</a>
     </li>
   </ul>
 </li>
@@ -482,16 +492,16 @@ div.tocify {
 </div>
 
 
-<div id="executive-summary" class="section level2">
-<h2>Executive Summary</h2>
+<div id="executive-summary" class="section level1">
+<h1>Executive Summary</h1>
 <p>The FIA Formula One World Championship has been one of the premier forms of racing around the world since its inaugural season in 1950. A set of csv files with different relations of F1 information are used to perform all the required data preprocessing tasks. We have come up with 2 different research questions so that we have directions to join the required files to get sufficient information. All the variables of the read-in data has been reviewed and converted into proper data types. We need to filter and select desired observations to find the solutions of our research questions. In addition, we also reshaped our data using spread, and transform the units of measurements of the variables with mutate in order to carry out better presentation of the results. Missing values and outliers are found in the datasets, we have explored the relation of the dataset extensively in order to minimize the missing values, as well as finding supporting reasons to retain the outliers. At last, we applied transformation and observe if there is any difference in normality in one of the variables in our dataset.</p>
 </div>
-<div id="selected-dataset---f1-from-kaggle" class="section level2">
-<h2>Selected Dataset - F1 from Kaggle</h2>
+<div id="selected-dataset---f1-from-kaggle" class="section level1">
+<h1>Selected Dataset - F1 from Kaggle</h1>
 <p>The dataset we used in this assignment is from an open source web site (<a href="https://www.kaggle.com" class="uri">https://www.kaggle.com</a>), details could be found at: <a href="https://www.kaggle.com/cjgdev/formula-1-race-data-19502017" class="uri">https://www.kaggle.com/cjgdev/formula-1-race-data-19502017</a>. This dataset contains all the formula one data from 1950 to 2017. It consists of 13 csv files. We are only looking into 6 of these files, which could provide all the relevant information to our research questions. Most of the variables in the files are self-explanatory. We are only listing those variables which require further explanations.</p>
 </div>
-<div id="research-question-1" class="section level2">
-<h2>Research Question 1</h2>
+<div id="research-question-1" class="section level1">
+<h1>Research Question 1</h1>
 <p>Who are the winner(s) for all the Grand Prix in 2017? Which constructor team do these winners belong to?</p>
 <p>results.csv - records all the racing results for each Grand Prix from 1950 - 2017. Variables: <em>totalmilliseconds</em> - stores the total time taken to finish all the laps in the entire Grand Prix for the particular driver.</p>
 <p>races.csv - records all the Grand Prix for different year. each Grand Prix is designated with a unique identifier, <em>circuitId</em>, and for each particular year, each Grand Prix would be assigned with a unique <em>raceId</em>. E.g. Australian Grand Prix has given circuitId=1, in 2017, it’s raceId is 969, in 2016, it’s raceId is 948. This file can be joined to the results file via <em>raceId</em>.</p>
@@ -542,8 +552,8 @@ names(fOne2017)[29] &lt;- &quot;driverSurName&quot;
 names(fOne2017)[30] &lt;- &quot;driverDOB&quot;
 names(fOne2017)[31] &lt;- &quot;driverNationality&quot;
 names(fOne2017)[32] &lt;- &quot;driverURL&quot;</code></pre>
-<div id="data-types-in-the-f1-dataset" class="section level3">
-<h3>Data types in the F1 Dataset</h3>
+<div id="data-types-in-the-f1-dataset" class="section level2">
+<h2>Data types in the F1 Dataset</h2>
 <p>Variables are listed according to the below desired data types:</p>
 <p>int: raceId, raceYear, driverId, statusId, constructorId, totalmilliseconds</p>
 <p>numeric: fastestLapSpeed</p>
@@ -612,8 +622,8 @@ head(winfo,20)</code></pre>
 <p>However, we can reshape our data if we have another research question.</p>
 </div>
 </div>
-<div id="research-question-2" class="section level2">
-<h2>Research Question 2</h2>
+<div id="research-question-2" class="section level1">
+<h1>Research Question 2</h1>
 <p>Compare the results of the top 3 players for Japanese Grand Prix in Year 2016 and 2017.</p>
 <p>We could transform our dataset as below for proper investigation:</p>
 <pre class="r"><code>#Filter to view 2016 and 2017 Japanese Grand Prix race [circuitId is 22] 
@@ -652,8 +662,8 @@ head(top3)</code></pre>
 ## 1 Japanese Grand Prix                 53    1     87.06     87.70        0.64
 ## 2 Japanese Grand Prix                 53    2     86.82     88.06        1.25
 ## 3 Japanese Grand Prix                 53    3     87.29     87.68        0.39</code></pre>
-<div id="scan-i---missing-values" class="section level3">
-<h3>Scan I - Missing values</h3>
+<div id="scan-i---missing-values" class="section level2">
+<h2>Scan I - Missing values</h2>
 <p>Scan the data for missing values, inconsistencies and obvious errors in the fOne2017 datasets. Steps and methodology are listed as below:</p>
 <pre class="r"><code># Create a function checkSumNA which will return total count of NA values for the pass-in variables 
 checkSumNA &lt;- function(x){
@@ -744,8 +754,8 @@ unique(fOne2017NoSumMS$status)</code></pre>
 <p><img src="R_2_F1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#</code></pre>
 </div>
-<div id="scan-ii---outliers" class="section level3">
-<h3>Scan II - Outliers</h3>
+<div id="scan-ii---outliers" class="section level2">
+<h2>Scan II - Outliers</h2>
 <p>As all the racing results are originated from the lapTime file, let’s look at the outliers racing minutes (minutes is easier for reader to interpret instead of milliseconds) of each lap in this dataset</p>
 <pre class="r"><code># Draw the box plot diagrams
 nrow(lap2017)</code></pre>
@@ -844,8 +854,8 @@ minFalse&lt;-min(falseOut$out)
 lap2017 &lt;- mutate(lap2017, outlier = ifelse(((isFinished == TRUE) &amp; ( minutes &gt;= minTrue)), &#39;outTrue&#39;, (ifelse(((isFinished == FALSE) &amp; ( minutes &gt;= minFalse)), &#39;outFalse&#39;, &#39;NA&#39; ))))</code></pre>
 </div>
 </div>
-<div id="data-transformation" class="section level2">
-<h2>Data Transformation</h2>
+<div id="data-transformation" class="section level1">
+<h1>Data Transformation</h1>
 <p>Let’s plot racing minutes for each lap in lap2017 and see how the data is distributed.</p>
 <pre class="r"><code>hist(lap2017$minutes, breaks=1000)</code></pre>
 <p><img src="R_2_F1_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>

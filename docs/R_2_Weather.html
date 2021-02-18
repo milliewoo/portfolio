@@ -372,24 +372,34 @@ div.tocify {
     <li class="divider"></li>
     <li class="dropdown-header">Statistic</li>
     <li>
-      <a href="R_1_Normal.html">Normal Distribution</a>
+      <a href="R_1_Normal.html">Body Measurements</a>
     </li>
     <li>
-      <a href="R_1_T-test.html">Paired T-test</a>
+      <a href="R_1_T-test.html">Supermarket Price Wars</a>
     </li>
     <li>
-      <a href="R_1_Regression.html">Regression</a>
+      <a href="R_1_Regression.html">Bike Rental Investigation</a>
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Data Wrangling</li>
     <li>
-      <a href="R_2_Weather.html">Exploring Data Structure</a>
+      <a href="R_2_Weather.html">Weather Records</a>
     </li>
     <li>
-      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+      <a href="R_2_WHO.html">WHO, Species and Surveys</a>
     </li>
     <li>
-      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+      <a href="R_2_F1.html">Formula One Racing</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Time Series Analysis</li>
+    <li>
+      <a href="R_3_TimeSeriesReport.html">Reports</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Applied Bayesian Statistics</li>
+    <li>
+      <a href="R_4_BayesianReport.html">Reports</a>
     </li>
   </ul>
 </li>
@@ -482,8 +492,8 @@ div.tocify {
 </div>
 
 
-<div id="data-description" class="section level2">
-<h2>Data Description</h2>
+<div id="data-description" class="section level1">
+<h1>Data Description</h1>
 <p>I went to Falls Creek for a ski trip before the Master course commenced. During my 3 days and 2 nights stay, the weather was pretty bad. I would like to understand more about the data structure of weather records from Bureau of Meteorology. I downloaded the data file “IDCJDW3027.201907.csv” (which recorded the July 2019 weather records in Falls Creek) and read that into R.</p>
 <p>My data set includes:</p>
 <ul>
@@ -506,8 +516,8 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="readimport-data" class="section level2">
-<h2>Read/Import Data</h2>
+<div id="readimport-data" class="section level1">
+<h1>Read/Import Data</h1>
 <p>I read and imported the data into R as a data frame, I have saved and named it as “fallsCreekJulyWeather”. I used the readr package to do so. The first 5 rows of the file is plain text info, which is irrelevant and shouldn’t be read in. Row 6 is the column header, in R, reading in <span class="math inline">\(^{\circ}\)</span>C scrambled the “Min Temp” and “Max Temp” header, so I decided to skip that row as well, and simply specified the header of the table in the col_names arguments.</p>
 <p>There are no data in some of the columns such as Evaporation (mm), Sunshine (hours), 9am cloud amount (oktas) etc. I skipped those columns by specifying “-” in the col_types arguments. I specified the following attributes in the col_types arguments to read in all the fields properly:</p>
 <ul>
@@ -573,8 +583,8 @@ head(fallsCreekJulyWeather, 31)</code></pre>
 ## #   Temperature` &lt;dbl&gt;, `3pm relative humidity` &lt;int&gt;, `3pm wind
 ## #   direction` &lt;fct&gt;, `3pm wind speed (km/h)` &lt;chr&gt;</code></pre>
 </div>
-<div id="inspect-and-understand" class="section level2">
-<h2>Inspect and Understand</h2>
+<div id="inspect-and-understand" class="section level1">
+<h1>Inspect and Understand</h1>
 <p>Inspect the data frame and variables using R functions :</p>
 <ul>
 <li><p>I used the dim function to check the dimensions of the data frame.</p>
@@ -754,8 +764,8 @@ str(fallsCreekJulyWeather)</code></pre>
 ##   ..   col_skip()
 ##   .. )</code></pre>
 </div>
-<div id="subsetting-i" class="section level2">
-<h2>Subsetting I</h2>
+<div id="subsetting-i" class="section level1">
+<h1>Subsetting I</h1>
 <p>Subset the data frame using first 10 observations (include all variables). Then convert it to a matrix.</p>
 <p>I checked the structure of the matrix, as matrix is homogeneous, everything has been converted to character.</p>
 <p>Character is the data type with highest order in coercion, all the other data types have been coerced into Character in my matrix.</p>
@@ -818,8 +828,8 @@ str(subFallsCreekJulyWeather)</code></pre>
 ##   ..$ : NULL
 ##   ..$ : chr [1:15] &quot;Date&quot; &quot;Min Temp&quot; &quot;Max Temp&quot; &quot;Rainfall (mm)&quot; ...</code></pre>
 </div>
-<div id="subsetting-ii" class="section level2">
-<h2>Subsetting II</h2>
+<div id="subsetting-ii" class="section level1">
+<h1>Subsetting II</h1>
 <p>Subset the data frame including only first and the last variable in the data set, save it as an R object file (.RData). Below is the relevant R codes with explanations and outputs:</p>
 <pre class="r"><code># Subset the dataset to include only the first and last variable  
 subFallsCreekJulyWeather1and15 &lt;- fallsCreekJulyWeather[,c(1,15)] 
@@ -850,8 +860,8 @@ str(subFallsCreekJulyWeather1and15)</code></pre>
 <pre class="r"><code># Save this subset into a R object file
 save(subFallsCreekJulyWeather1and15, file=&quot;output/R/2_Weather_1and15.Rdata&quot;)</code></pre>
 </div>
-<div id="create-a-new-data-frame" class="section level2">
-<h2>Create a new Data Frame</h2>
+<div id="create-a-new-data-frame" class="section level1">
+<h1>Create a new Data Frame</h1>
 <p>Create a data frame with 2 variables and 4 observations. The data frame contains one integer variable <em>intVar</em> and one ordinal variable <em>ordVar</em>.</p>
 <p><em>ordVar</em> has been factored with proper order. I have checked the structure of my variables and the levels of the ordinal variable as below. After that I have created a numeric vector, <em>Avg_waiting_time</em> and use cbind() to add it to my data frame.</p>
 <p>I then checked the attributes and the dimension of your new data frame. Below is the relevant R codes with explanations and outputs:</p>

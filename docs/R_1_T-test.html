@@ -372,24 +372,34 @@ div.tocify {
     <li class="divider"></li>
     <li class="dropdown-header">Statistic</li>
     <li>
-      <a href="R_1_Normal.html">Normal Distribution</a>
+      <a href="R_1_Normal.html">Body Measurements</a>
     </li>
     <li>
-      <a href="R_1_T-test.html">Paired T-test</a>
+      <a href="R_1_T-test.html">Supermarket Price Wars</a>
     </li>
     <li>
-      <a href="R_1_Regression.html">Regression</a>
+      <a href="R_1_Regression.html">Bike Rental Investigation</a>
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Data Wrangling</li>
     <li>
-      <a href="R_2_Weather.html">Exploring Data Structure</a>
+      <a href="R_2_Weather.html">Weather Records</a>
     </li>
     <li>
-      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+      <a href="R_2_WHO.html">WHO, Species and Surveys</a>
     </li>
     <li>
-      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+      <a href="R_2_F1.html">Formula One Racing</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Time Series Analysis</li>
+    <li>
+      <a href="R_3_TimeSeriesReport.html">Reports</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Applied Bayesian Statistics</li>
+    <li>
+      <a href="R_4_BayesianReport.html">Reports</a>
     </li>
   </ul>
 </li>
@@ -482,13 +492,13 @@ div.tocify {
 </div>
 
 
-<div id="executive-statement" class="section level2">
-<h2>Executive Statement</h2>
+<div id="executive-statement" class="section level1">
+<h1>Executive Statement</h1>
 <p>The aim of this report was to investigate whether Coles or Woolworths is cheaper. We have used their online website to collect pricing of matched products in a side-by-side manner. We selected 119 sample products randomly across different category [Cluster sampling method], such as beverage, veggies, fruits, dairy and cleaning products.<br />
 We then compared the means of these exactly same sample products from two different supermarkets. We performed a paired sample t-test to determine if there is any statistically significant difference between prices in Coles and Woolworths. Variables of the data we collected were Items (item name),Coles(price at Coles),Woolworths(price at Woolworths). Our findings showed that there is no statistically significant difference between the means of pricing for the same sample products from Coles and Woolworths. Therefore, we can conclude that the products at Coles and Woolworths are comparable and not cheaper to each others.</p>
 </div>
-<div id="summary-statistics" class="section level2">
-<h2>Summary Statistics</h2>
+<div id="summary-statistics" class="section level1">
+<h1>Summary Statistics</h1>
 <p>The chosen products were needed to comply with a set of guidelines where the products were: the same brand, the same quantity (e.g. by weight or volume), at standard price (e.g. not on special).Read in our side by side price list, which we have simply recorded down the product name in first column, Coles pricing of this particular product in the second column, and Woolworth pricing of the exactly same product in the third column. All the pricing were collected between 11th to 16th of September 2019.</p>
 <pre class="r"><code>rm(list=ls())
 price_list &lt;- read_csv(&quot;src/R/stats/price_list.csv&quot;) 
@@ -565,12 +575,12 @@ qqPlot(price_list$d, dist=&quot;norm&quot;, main=&quot;QQ Plot of the difference
 <p><img src="R_1_T-test_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 21 23</code></pre>
 </div>
-<div id="central-limit-theorem" class="section level2">
-<h2>Central Limit Theorem</h2>
+<div id="central-limit-theorem" class="section level1">
+<h1>Central Limit Theorem</h1>
 <p>From the above QQPlot, we could notice the price difference of the random sample we drawn from both supermarkets might not fit well to normal distribution. However, based on Central Limit Theorem, distribution of the sample mean of differences will be approximately normally distributed, regardless of the underlying population distribution when the sample size is large (i.e. n&gt;30). Since our sample size is 119, we can effectively ignore the issue with normality for the price difference of the sample data from both supermarkets and proceed with the paired sample t-test.</p>
 </div>
-<div id="hypothesis-test" class="section level2">
-<h2>Hypothesis Test</h2>
+<div id="hypothesis-test" class="section level1">
+<h1>Hypothesis Test</h1>
 <p>Paired sample t-test was used to determine which supermarket is the cheapest.</p>
 <p><span class="math inline">\(H_0: \mu_\Delta=0\)</span></p>
 <p><span class="math inline">\(H_A: \mu_\Delta\neq0\)</span></p>
@@ -644,12 +654,12 @@ granova.ds(
 <p>The p-value is 0.65.As p &gt;.05, we fail to reject <span class="math inline">\(H_0\)</span>. There was no statistically significant mean difference in the prices between Coles and Woolworths.</p>
 <p>The 95% CI of the mean difference is found to be [-0.3953052,0.6299271]. As the 95% CI does capture <span class="math inline">\(H_0\)</span>, we fail to reject it.</p>
 </div>
-<div id="interpretation" class="section level2">
-<h2>Interpretation</h2>
+<div id="interpretation" class="section level1">
+<h1>Interpretation</h1>
 <p>A paired sample t-test was used to test for a significant difference between the means of pricing for the same sample products from Coles and Woolworths. The difference in pricing for these randomly selected products exhibited evidence of non-normality upon inspection of the normal Q-Q plot for both supermarkets, the central limit theorem ensured that the t-test could be applied due to the large sample size, n = 119, in each group. The results of the paired t-test failed to find statistically significant evidence that there would be difference in the means of the population pricing between Coles and Woolworths despite discovering a difference in the means of the sample dataset. The paired t-test found, t(df=118)=0.45, p=0.65, 95% CI [-0.3953052,0.6299271]. The results of the investigation suggest that both supermarkets are not cheaper to each other.</p>
 </div>
-<div id="discussion" class="section level2">
-<h2>Discussion</h2>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
 <p>From the findings of our investigation we can conclude that there is no statistically significant mean difference between the prices of Coles and Woolworths. The strengths of our investigation would be having a good sample size (n&gt;30) and having a set of guidelines (same brand, same weight etc.) while collecting data. However, there might have been certain limitations like human error during data collection and data entry.</p>
 <p>To overcome the limitations, we could possibly increase the sample size in our research.</p>
 <p>We also noticed there are numbers of outliers when we compared the pricing from both supermarkets using the box plot, when we examined closer to the data, the outliers belong to products at higher price range. This reflects sensibly to the pricing distribution in supermarket, as most of the consumable items are less than 10 dollars, with a small number of high-end products, such as meat, seafood or even bulk-buy valued pack. In our research, we didn’t remove the outliers, as these data resemble the true population, and the proportion would not affect our results. However the research would be more comprehensive, if we can broaden our collections and compare various sample sets to see if there would be any difference in sampling high price range products and draw different conclusions.</p>

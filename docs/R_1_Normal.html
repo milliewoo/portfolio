@@ -374,24 +374,34 @@ div.tocify {
     <li class="divider"></li>
     <li class="dropdown-header">Statistic</li>
     <li>
-      <a href="R_1_Normal.html">Normal Distribution</a>
+      <a href="R_1_Normal.html">Body Measurements</a>
     </li>
     <li>
-      <a href="R_1_T-test.html">Paired T-test</a>
+      <a href="R_1_T-test.html">Supermarket Price Wars</a>
     </li>
     <li>
-      <a href="R_1_Regression.html">Regression</a>
+      <a href="R_1_Regression.html">Bike Rental Investigation</a>
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Data Wrangling</li>
     <li>
-      <a href="R_2_Weather.html">Exploring Data Structure</a>
+      <a href="R_2_Weather.html">Weather Records</a>
     </li>
     <li>
-      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+      <a href="R_2_WHO.html">WHO, Species and Surveys</a>
     </li>
     <li>
-      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+      <a href="R_2_F1.html">Formula One Racing</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Time Series Analysis</li>
+    <li>
+      <a href="R_3_TimeSeriesReport.html">Reports</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Applied Bayesian Statistics</li>
+    <li>
+      <a href="R_4_BayesianReport.html">Reports</a>
     </li>
   </ul>
 </li>
@@ -484,8 +494,8 @@ div.tocify {
 </div>
 
 
-<div id="problem-statement" class="section level2">
-<h2>Problem Statement</h2>
+<div id="problem-statement" class="section level1">
+<h1>Problem Statement</h1>
 <p>The body girth and skeletal diameter measurements, together with age, weight, height, and gender for 507 physically active individuals: 247 men and 260 women have been given in the “bdims.csv” file on RMIT canvas website. I have chosen one particular measurement, <strong>the chest girth</strong>, to investigate whether this measurement would fit into the normal distribution model. Following steps are involved:</p>
 <ul>
 <li>Find the descriptive statistics (e.g. mean, median, standard deviation, first and third quartile, interquartile range, minimum and maximum values) of the chest girth by sex</li>
@@ -500,8 +510,8 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="data" class="section level2">
-<h2>Data</h2>
+<div id="data" class="section level1">
+<h1>Data</h1>
 <p>Import the body measurements data and prepare it for analysis as below:</p>
 <pre class="r"><code># Only read in the data from che.gi (11th) and sex (25th) column of the bdims.csv file
 bdims &lt;- read_csv(&quot;src/R/stats/bdims.csv&quot;, col_types =&quot;----------d-------------i&quot;)
@@ -509,8 +519,8 @@ bdims &lt;- read_csv(&quot;src/R/stats/bdims.csv&quot;, col_types =&quot;-------
 # Set the sex variable as factor. identify 1 = male, 0 = female
 bdims$sex &lt;- factor(bdims$sex, levels=c(1,0), labels=c(&quot;male&quot;,&quot;female&quot;))</code></pre>
 </div>
-<div id="summary-statistics" class="section level2">
-<h2>Summary Statistics</h2>
+<div id="summary-statistics" class="section level1">
+<h1>Summary Statistics</h1>
 <p>Calculate the statistics and remove the outliners</p>
 <pre class="r"><code>#Filter bdims by sex, save into 2 dataframes and find the descriptive statistics respectively 
 m &lt;- filter(bdims, bdims$sex==&quot;male&quot;)
@@ -731,8 +741,8 @@ Male
 </tbody>
 </table>
 </div>
-<div id="distribution-fitting" class="section level2">
-<h2>Distribution Fitting</h2>
+<div id="distribution-fitting" class="section level1">
+<h1>Distribution Fitting</h1>
 <p>Compare the empirical distribution of chest girth to a normal distribution separately in men and in women.</p>
 <pre class="r"><code># Step 1: Draw the histogram with the filtered chest girth data for female
 hf &lt;- fNoO$che.gi %&gt;% hist(col=&quot;grey&quot;,xlab=&quot;Chest Girth (cm)&quot;, main= &quot;Histogram of Female Chest Girth overlay with\n normal distribution curve&quot;, breaks=25, xlim= c(70, 105), ylim = c(0, 30), cex.main = 0.8)
@@ -881,8 +891,8 @@ ks.test(fNoO$che.gi, &quot;pnorm&quot;, cgFNOMean, cgFNOSD)</code></pre>
 ## D = 0.037948, p-value = 0.8706
 ## alternative hypothesis: two-sided</code></pre>
 </div>
-<div id="interpretation" class="section level2">
-<h2>Interpretation</h2>
+<div id="interpretation" class="section level1">
+<h1>Interpretation</h1>
 <p>From the above graphs, visually, I could see that for both male and female:</p>
 <ul>
 <li>the derived histograms fit resonably well to the normal distribution curves.</li>

@@ -374,24 +374,34 @@ div.tocify {
     <li class="divider"></li>
     <li class="dropdown-header">Statistic</li>
     <li>
-      <a href="R_1_Normal.html">Normal Distribution</a>
+      <a href="R_1_Normal.html">Body Measurements</a>
     </li>
     <li>
-      <a href="R_1_T-test.html">Paired T-test</a>
+      <a href="R_1_T-test.html">Supermarket Price Wars</a>
     </li>
     <li>
-      <a href="R_1_Regression.html">Regression</a>
+      <a href="R_1_Regression.html">Bike Rental Investigation</a>
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Data Wrangling</li>
     <li>
-      <a href="R_2_Weather.html">Exploring Data Structure</a>
+      <a href="R_2_Weather.html">Weather Records</a>
     </li>
     <li>
-      <a href="R_2_WHO.html">Dplyr and Tidyr packages, Missing Values and Outliers</a>
+      <a href="R_2_WHO.html">WHO, Species and Surveys</a>
     </li>
     <li>
-      <a href="R_2_F1.html">Data Preparation and Transformation</a>
+      <a href="R_2_F1.html">Formula One Racing</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Time Series Analysis</li>
+    <li>
+      <a href="R_3_TimeSeriesReport.html">Reports</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Applied Bayesian Statistics</li>
+    <li>
+      <a href="R_4_BayesianReport.html">Reports</a>
     </li>
   </ul>
 </li>
@@ -484,15 +494,15 @@ div.tocify {
 </div>
 
 
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <p>Bike sharing programs are high in demand these days. The benefits of bike sharing include reducing pollution, traffic, travel costs and dependence on oil, while improving public health. This study is intended to understand how environmental factors such as temperature promote or hinder public bike sharing.</p>
 </div>
-<div id="problem-statement" class="section level2">
-<h2>Problem Statement</h2>
+<div id="problem-statement" class="section level1">
+<h1>Problem Statement</h1>
 <p>The goal is to determine whether bike renting is affected by outside temperature. A simple linear regression model is the type of model that best describes the relationship between temperature and number of rented bikes.</p>
-<div id="data-1" class="section level3">
-<h3>Data 1</h3>
+<div id="data-1" class="section level2">
+<h2>Data 1</h2>
 <p>The dataset (day.csv) was obtained from UCI Machine Learning Repository. The URL for the dataset is as follows: <a href="https://archive.ics.uci.edu/ml/datasets/Bike+Sharing+Dataset" class="uri">https://archive.ics.uci.edu/ml/datasets/Bike+Sharing+Dataset</a> The variables in the dataset are as follows:</p>
 <ul>
 <li>instant: record index</li>
@@ -506,8 +516,8 @@ div.tocify {
 <li>weathersit : season (1: Clear, Few clouds, Partly cloudy, Partly cloudy, 2: Mist + Cloudy, Mist + Broken clouds, Mist + Few clouds, Mist, 3: Light Snow, Light Rain + Thunderstorm + Scattered clouds, Light Rain + Scattered clouds, 4: Heavy Rain + Ice Pallets + Thunderstorm + Mist, Snow + Fog)</li>
 </ul>
 </div>
-<div id="data-2" class="section level3">
-<h3>Data 2</h3>
+<div id="data-2" class="section level2">
+<h2>Data 2</h2>
 <ul>
 <li>temp : Normalized temperature in Celsius. The values are derived via (t-t_min)/(t_max-t_min), t_min=-8, t_max=+39 (only in hourly scale)</li>
 <li>atemp : Normalized feeling temperature in Celsius. The values are derived via (t-t_min)/(t_max-t_min), t_min=-16, t_max=+50 (only in hourly scale)</li>
@@ -520,8 +530,8 @@ div.tocify {
 <p>The variables we are dealing with are temp and cnt.</p>
 </div>
 </div>
-<div id="descriptive-statistics-and-visualisation-1" class="section level2">
-<h2>Descriptive Statistics and Visualisation 1</h2>
+<div id="descriptive-statistics-and-visualisation-1" class="section level1">
+<h1>Descriptive Statistics and Visualisation 1</h1>
 <ul>
 <li>Read the data</li>
 </ul>
@@ -663,8 +673,8 @@ Count of Bike Rentals
 </tbody>
 </table>
 <p>There are no missing values in the variables temperature and count of rental bikes.</p>
-<div id="outliers" class="section level3">
-<h3>Outliers</h3>
+<div id="outliers" class="section level2">
+<h2>Outliers</h2>
 <p>The mvn() function can be used to detect multivariate outliers of the variables.</p>
 <pre class="r"><code>daytempcnt &lt;- day[,c(&quot;temp&quot;,&quot;cnt&quot;)]
 results &lt;- mvn(data = daytempcnt, multivariateOutlierMethod = &quot;quan&quot;, showOutliers = TRUE,showNewData = TRUE)</code></pre>
@@ -678,12 +688,12 @@ results &lt;- mvn(data = daytempcnt, multivariateOutlierMethod = &quot;quan&quot
 <p>There are 3 outliers in the dataset. We will be removing the 3 outliers and use the rest of the dataset for the analysis.</p>
 </div>
 </div>
-<div id="decsriptive-statistics-and-visualisation-2" class="section level2">
-<h2>Decsriptive Statistics and Visualisation 2</h2>
+<div id="decsriptive-statistics-and-visualisation-2" class="section level1">
+<h1>Decsriptive Statistics and Visualisation 2</h1>
 <pre class="r"><code>plot(cnt~temp, data = daytempcntdata,ylab=&quot;No.of Bike Rentals&quot;, xlab=&quot;Temperature&quot;, main=&quot;Bike Rentals by Temperature&quot;)</code></pre>
 <p><img src="R_1_Regression_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /> The scatter plot shows that the two variables have some linearity. A simple linear regression was performed on the two variables without the outliers.</p>
-<div id="simple-linear-regression-assumption-1" class="section level3">
-<h3>Simple Linear Regression Assumption 1</h3>
+<div id="simple-linear-regression-assumption-1" class="section level2">
+<h2>Simple Linear Regression Assumption 1</h2>
 <ul>
 <li>Residual vs Fitted</li>
 </ul>
@@ -691,24 +701,24 @@ results &lt;- mvn(data = daytempcnt, multivariateOutlierMethod = &quot;quan&quot
 plot(model1,which = 1)</code></pre>
 <p><img src="R_1_Regression_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /> The relationship between fitted values and residuals is flat (look at the red line), this is a good indication that the relationship between temperature and number of bikes rented is linear. In the plot above, the variance appears to remain the same. Therefore,we can assume homoscedasticity.</p>
 </div>
-<div id="simple-linear-regression-assumption-2" class="section level3">
-<h3>Simple Linear Regression Assumption 2</h3>
+<div id="simple-linear-regression-assumption-2" class="section level2">
+<h2>Simple Linear Regression Assumption 2</h2>
 <ul>
 <li>Normal Q-Q</li>
 </ul>
 <pre class="r"><code>plot(model1,which = 2)</code></pre>
 <p><img src="R_1_Regression_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /> The above plot suggests that there is no significant deviation from normality. It would be safe to assume that the residuals are approximately distributed normally.</p>
 </div>
-<div id="simple-linear-regression-assumption-3" class="section level3">
-<h3>Simple Linear Regression Assumption 3</h3>
+<div id="simple-linear-regression-assumption-3" class="section level2">
+<h2>Simple Linear Regression Assumption 3</h2>
 <ul>
 <li>Scale-Location</li>
 </ul>
 <pre class="r"><code>plot(model1,which = 3)</code></pre>
 <p><img src="R_1_Regression_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /> The red line is nearly flat and the variance in the square root of the standardised residuals is consistent across predicted (fitted values).</p>
 </div>
-<div id="simple-linear-regression-assumption-4" class="section level3">
-<h3>Simple Linear Regression Assumption 4</h3>
+<div id="simple-linear-regression-assumption-4" class="section level2">
+<h2>Simple Linear Regression Assumption 4</h2>
 <ul>
 <li>Residual vs Leverage</li>
 </ul>
@@ -716,8 +726,8 @@ plot(model1,which = 1)</code></pre>
 <p><img src="R_1_Regression_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /> The above plot shows that there are no evidence of influencial cases.</p>
 </div>
 </div>
-<div id="simple-linear-regression-summary" class="section level2">
-<h2>Simple Linear Regression Summary</h2>
+<div id="simple-linear-regression-summary" class="section level1">
+<h1>Simple Linear Regression Summary</h1>
 <pre class="r"><code>model1 %&gt;% summary()</code></pre>
 <pre><code>## 
 ## Call:
@@ -739,14 +749,14 @@ plot(model1,which = 1)</code></pre>
 ## F-statistic:   467 on 1 and 726 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The <span class="math inline">\(R^2\)</span> for the above regression suggests that normalised temperature explains 39% of the variabiltiy in number of bikes rented.</p>
 </div>
-<div id="hypthesis-testing-1" class="section level2">
-<h2>Hypthesis Testing 1</h2>
+<div id="hypthesis-testing-1" class="section level1">
+<h1>Hypthesis Testing 1</h1>
 <p>The model summary also recorded a F statistic which is used to assess the regression model. F-test has statistical hypotheses as follows:</p>
 <p><span class="math display">\[H_0: The \ data \ do \ not \ fit \ the \ linear \ regression \ model \]</span></p>
 <p><span class="math display">\[H_A: The \ data \ fit \ the \ linear \ regression \ model\]</span> The p-value for the F-Test reported in the model summary is &lt;.001. Therefore,we reject <span class="math inline">\(H_{0}\)</span>.There was statistically significant evidence that the data fit a linear regression model.</p>
 </div>
-<div id="hypthesis-testing-2" class="section level2">
-<h2>Hypthesis Testing 2</h2>
+<div id="hypthesis-testing-2" class="section level1">
+<h1>Hypthesis Testing 2</h1>
 <p>We set the following statistical hypotheses to check the statistical significance of the intercept:</p>
 <p><span class="math display">\[H_0: \alpha=0\ \]</span> <span class="math display">\[H_A: \alpha\ne0\ \]</span> This hypothesis is tested using a t statistic, reported as t=7.722,p &lt; .001. The intercept is statistically significant at the 0.05 level. This means statistically significant evidence exists that the intercept is not 0.</p>
 <pre class="r"><code>model1 %&gt;% confint()</code></pre>
@@ -755,25 +765,25 @@ plot(model1,which = 1)</code></pre>
 ## temp        5996.0335 7194.287</code></pre>
 <p><span class="math inline">\(H_0: \alpha=0\ \)</span> was not captured by the confidence interval. Therefore, we reject it.</p>
 </div>
-<div id="hypthesis-testing-3" class="section level2">
-<h2>Hypthesis Testing 3</h2>
+<div id="hypthesis-testing-3" class="section level1">
+<h1>Hypthesis Testing 3</h1>
 <p>The hypothesis test of the slope is as follows:</p>
 <p><span class="math display">\[H_0: \beta=0\ \]</span></p>
 <p><span class="math display">\[H_A: \beta\ne0\ \]</span> The slope was also tested using a t statistic which was reported as t=21.611,p &lt; .001. As p&lt;0.05, we reject <span class="math inline">\(H_0\)</span>. Looking at the confint() function, the 95% confidence interval does not capture 0. Therefore, we reject <span class="math inline">\(H_0\)</span>. There is statistically significant evidence that temperature is positively related to number of bikes rented.</p>
 </div>
-<div id="simple-linear-regression" class="section level2">
-<h2>Simple Linear Regression</h2>
+<div id="simple-linear-regression" class="section level1">
+<h1>Simple Linear Regression</h1>
 <pre class="r"><code>plot(cnt~temp, data = daytempcntdata)
 abline(model1,col=&quot;red&quot;)</code></pre>
 <p><img src="R_1_Regression_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /> A linear regression model was fitted with a single predictor,temperature, to estimate the dependent variable,count of bikes rented. A scatter plot testing the bivariate relationship between temperature and count was examined before fitting the regression. A positive linear relationship was shown by the scatter plot. Other non-linear trends were omitted. The overall regression model was statistically significant, F(1,726)=426, p&lt; .001, and explained 39% of the variability in count of bikes, <span class="math inline">\(R^2\)</span>=.39. The estimated regression equation was cnt=1246.2+.6595.2∗temp. The positive slope for temperature was statistically significant, b=6595.2, t=21.611, p&lt;.001, 95% CI [5996.0335,7194.287]. Final inspection of the residuals supported normality and homoscedasticity.</p>
 </div>
-<div id="discussion" class="section level2">
-<h2>Discussion</h2>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
 <p>The positive linear relationship between temperature and bike rental count shows that higher the temperature, higher the bike rental count. The warm weather promotes the use of public bikes.</p>
 <p>It would be very interesting, if we could extend our research to other factors, such as humidity and windspeed and explore if these factors could also impose any inference on bike rental. We could also investigate if there is any difference in weather influence on bike rental in different metropolitan cities and make statistical comparisons. The research question can roll on extensively base on the above preliminary findings.</p>
 </div>
-<div id="references" class="section level2">
-<h2>References</h2>
+<div id="references" class="section level1">
+<h1>References</h1>
 <p>Original Source: <a href="http://capitalbikeshare.com/system-data" class="uri">http://capitalbikeshare.com/system-data</a></p>
 <p>Weather Information: <a href="http://www.freemeteo.com" class="uri">http://www.freemeteo.com</a></p>
 <p>Holiday Schedule: <a href="http://dchr.dc.gov/page/holiday-schedule" class="uri">http://dchr.dc.gov/page/holiday-schedule</a></p>
