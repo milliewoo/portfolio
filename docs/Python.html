@@ -11,7 +11,7 @@
 
 
 
-<title>Python Repository</title>
+<title>Python Repository Overview</title>
 
 <script src="site_libs/header-attrs-2.3.2/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -340,7 +340,7 @@ $(document).ready(function () {
       <a href="Python.html">Overview</a>
     </li>
     <li class="divider"></li>
-    <li class="dropdown-header">Data Analysis &amp; Modelling</li>
+    <li class="dropdown-header">Practical Data Science</li>
     <li>
       <a href="Python_1_StarWars.html">Star Wars</a>
     </li>
@@ -411,7 +411,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Python Repository</h1>
+<h1 class="title toc-ignore">Python Repository Overview</h1>
 
 </div>
 
@@ -427,33 +427,75 @@ $(document).ready(function () {
   margin-right: 10px;
 }
 
-
-
 </style>
-<div class="row" style="padding-top: 30px;">
-<div class="col-sm-3" style="background-color:#ccc; text-align: left ;">
-<div id="data-analysis-and-modelling" class="section level3">
-<h3>Data Analysis and Modelling</h3>
-<p><a href="Python_1_StarWars.html">Star Wars</a></p>
-<p><a href="Python_1_RSSI.html">RSSI</a></p>
+<div id="practical-data-science" class="section level3">
+<h3>Practical Data Science</h3>
+<p>Dive-in to handle data in more complex formats. Cover data analysis life-cylce from initial access and acquisition, modeling, transformation, integration, querying. Also explore the application of statistical learning and data mining methods.</p>
+<ol style="list-style-type: decimal">
+<li><p><a href="Python_1_StarWars.html">Star Wars</a> - Explore and cleanse the given Star Wars dataset. Investigate 3 research areas:</p>
+<ul>
+<li>Ranking on each Star Wars movies</li>
+<li>Pairwise comparisons between
+<ul>
+<li>Fans of Star Wars and Fans of Star Trek</li>
+<li>Fans of Star Wars and (Fans of / Familiarity on) Expanded Universe</li>
+</ul></li>
+<li>Demographic impact (Gender, Age, Income, Education or region) on favoriability of Star Wars characters. Perform Chi Square test on the associations.<br />
+<br></li>
+</ul></li>
+<li><p><a href="Python_1_RSSI.html">RSSI</a> - Identify signal measurement patterns from the given dataset and investigate whether clustering could help us to group all these patterns into organized structure.</p></li>
+</ol>
 </div>
 <div id="machine-learning" class="section level3">
 <h3>Machine Learning</h3>
-<p><a href="Python_2_KNN.html">Data Preparation and KNN</a></p>
-<p><a href="Python_2_DT.html">Decision Tree</a></p>
-<p><a href="Python_2_NB.html">Naive Bayes</a></p>
-<p><a href="Python_2_Model.html">Model Evaluation</a></p>
-<p><a href="Python_2_SpeedDating.html">Final Project - Speed Dating</a></p>
-</div>
-</div>
-<div class="col-sm-9">
-<div id="data-analysis-and-modelling-1" class="section level3">
-<h3>Data Analysis and Modelling</h3>
-<p>First Python subject in course for me.</p>
-</div>
-<div id="machine-learning-1" class="section level3">
-<h3>Machine Learning</h3>
-</div>
+<ol style="list-style-type: decimal">
+<li><p><a href="Python_2_KNN.html">Data Preparation and KNN</a> - 2 Tasks are given in the assignment:</p>
+<ul>
+<li>Perform necessary data pre-processing steps on a a given dataset from UCI ML Repository so that the cleaned dataset can be directly fed into any classification algorithm within the Scikit-Learn Python module without any further changes.</li>
+<li>Given a dataset with CPI and features of various countries, use KNN algorithm to perform predictions on CPI of Russia when only descriptive features are provided.</li>
+</ul></li>
+</ol>
+<p><br></p>
+<ol start="2" style="list-style-type: decimal">
+<li><p><a href="Python_2_DT.html">Decision Tree</a> - Use the given data as the entire training dataset, demonstrate the understand of decision tree algorithm by:</p>
+<ul>
+<li>Calculating the impurity of target feature</li>
+<li>Determine the optimal root node of the decision tree</li>
+<li>Determine the leaf predictions if specific descriptive feature is assumed to be the root node</li>
+</ul></li>
+</ol>
+<p><br></p>
+<ol start="3" style="list-style-type: decimal">
+<li><p><a href="Python_2_NB.html">Naive Bayes</a> - Treat the given data as the entire training dataset, use the built-in sklearn naive bayes module in python, and perform the following tasks:</p>
+<ul>
+<li>Transform all descriptive features into binary, train and search for the best Bernoulli NB model by fine tuning the alpha parameter. Score the best Bernoulli NB model by accuracy.</li>
+<li>Transform all descriptive features into binary, train and search for the best Gaussian model by fine tuning the var_smoothing parameter. Score the best Gaussian NB model by accuracy.</li>
+<li>Retain the original format of the dataset, train the categorical features with Bernoulli NB model, train the numeric features with Gaussian model, combine the results into a hybrid NB Classifier. Score the hybrid NB classifer by accuracy.</li>
+<li>List all the obtained scores in a dataframe</li>
+</ul></li>
+</ol>
+<p><br></p>
+<ol start="4" style="list-style-type: decimal">
+<li><p><a href="Python_2_Model.html">Model Evaluation</a> - Given a score file for binary prediction, perform the following tasks:</p>
+<ul>
+<li>construct confusion matrix (default threshold=0.5)</li>
+<li>calculate 5 metrics (default threshold=0.5):
+<ul>
+<li>Error Rate</li>
+<li>Precision</li>
+<li>TPR</li>
+<li>F-1 Score</li>
+<li>FPR</li>
+</ul></li>
+<li>Varying the score threshold from 0.1 to 0.9 (both inclusive) in 0.1 increments, compute TPR and FPR values and plot the ROC curve.</li>
+</ul></li>
+</ol>
+<p><br></p>
+<ol start="5" style="list-style-type: decimal">
+<li><a href="Python_2_SpeedDating.html">Final Project - Speed Dating</a>* - We have chosen a speed dating dataset from a provided github site, perform data pre-processing, visualize and explore the data, then split the data into training and testing portion, use grid search and hyperparameter tuning (with feature selection) to select the best tuned model for 5 machine learning algorithms with the training data. Then draw conclusion base on comparing the performance of prediction (with testing data) from these best tuned models.</li>
+</ol>
+<p><br> <br></p>
+<p><strong>N.B.</strong> * indicates open ended assignment</p>
 </div>
 
 
